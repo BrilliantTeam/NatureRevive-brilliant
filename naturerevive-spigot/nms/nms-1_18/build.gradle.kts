@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    id("io.papermc.paperweight.userdev") version "1.7.1"
+    id("io.papermc.paperweight.userdev")
 }
 
 
@@ -8,7 +8,7 @@ group = "engineer.skyouo.plugins.naturerevive.spigot.nms"
 version = project.rootProject.version
 
 dependencies {
-    paperDevBundle("1.18-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.18-R0.1-SNAPSHOT")
 
     compileOnly("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
     compileOnly(project(":naturerevive-common"))

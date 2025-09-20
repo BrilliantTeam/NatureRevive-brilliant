@@ -60,7 +60,7 @@ public class RegenThisChunkCommand implements SubCommand {
                 return;
             }
 
-            ChunkRegeneration.regenerateChunk(new BukkitPositionInfo(player.getLocation(), 0L), engineIntegration);
+            ChunkRegeneration.regenerateChunk(new BukkitPositionInfo(player.getLocation(), 0L), engineIntegration, true);
         });
         return true;
     }

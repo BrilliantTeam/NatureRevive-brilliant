@@ -191,6 +191,13 @@ public class ChunkRelatedEventListener implements Listener {
     }
 
     public static void flagChunk(Location location) {
+        if (location == null)
+            return;
+
+        if (!NatureRevivePlugin.readonlyConfig.allowedWorld.isEmpty() &&
+                !NatureRevivePlugin.readonlyConfig.allowedWorld.contains(location.getWorld().getName()))
+            return;
+
         if (NatureRevivePlugin.readonlyConfig.ignoredWorld.contains(location.getWorld().getName()))
             return;
 

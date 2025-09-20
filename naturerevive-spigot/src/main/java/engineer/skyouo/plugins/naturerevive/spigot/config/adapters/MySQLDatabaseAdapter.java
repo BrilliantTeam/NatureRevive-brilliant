@@ -55,7 +55,6 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     }
 
     public void set(BukkitPositionInfo positionInfo) {
-        // todo: let scheduler hold to prevent saving causing massively lag spike
         try (Connection connection = hikari.getConnection(); Statement statement = connection.createStatement()) {
             boolean hasKey = cache.containsKey(positionInfo.getLocation());
 
@@ -83,30 +82,6 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
 
         if (cache.containsKey(posLocation))
             return cache.get(posLocation);
-
-        /*
-
-        try (Connection connection = hikari.getConnection(); Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement
-                    .executeQuery("SELECT * FROM " + NatureRevive.readonlyConfig.databaseTableName + " WHERE X = " + positionInfo.getX() + " AND Z = " + positionInfo.getZ() +  " AND WORLDNAME = '" + location.getWorld().getName() + "';");
-
-            if (resultSet.isClosed())
-                return null;
-
-            if (!resultSet.next())
-                return null;
-
-            String worldName = resultSet.getString("WORLDNAME");
-
-            BukkitPositionInfo BukkitPositionInfo = new BukkitPositionInfo(resultSet.getInt("X"), resultSet.getInt("Z"), resultSet.getLong("TTL"), worldName);
-            resultSet.close();
-            return BukkitPositionInfo;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-         */ // NCT skyouo - do not perform further lookup
 
         return null;
     }
@@ -138,32 +113,6 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     public BukkitPositionInfo get(BukkitPositionInfo positionInfo) {
         if (cache.containsKey(positionInfo.getLocation()))
             return cache.get(positionInfo.getLocation());
-
-        /*
-
-        try (Connection connection = hikari.getConnection(); Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement
-                    .executeQuery("SELECT * FROM " + NatureRevive.readonlyConfig.databaseTableName + " WHERE X = " + positionInfo.getX() + " AND Z = " + positionInfo.getZ() +  " AND WORLDNAME = '" + BukkitPositionInfo.getLocation().getWorld().getName() + "';");
-
-            if (resultSet.isClosed())
-                return null;
-
-            if (!resultSet.next())
-                return null;
-
-            String worldName = resultSet.getString("WORLDNAME");
-
-            BukkitPositionInfo BukkitPositionInfoResult = new BukkitPositionInfo(resultSet.getInt("X"), resultSet.getInt("Z"), resultSet.getLong("TTL"), worldName);
-            resultSet.close();
-
-            return BukkitPositionInfoResult;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-         */ // NCT skyouo - do not perform further lookup
 
         return null;
     }
@@ -234,7 +183,7 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     @Override
     public void massInsert(Set<BukkitPositionInfo> BukkitPositionInfoSet) {
         try (Connection connection = hikari.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?);");
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE TTL = ?;");
             for (BukkitPositionInfo positionInfo : BukkitPositionInfoSet) {
                 cache.put(positionInfo.getLocation(), positionInfo);
 
@@ -242,6 +191,7 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
                 preparedStatement.setInt(2, positionInfo.getZ());
                 preparedStatement.setLong(3, positionInfo.getTTL());
                 preparedStatement.setString(4, positionInfo.getWorldName());
+                preparedStatement.setLong(5, positionInfo.getTTL());
                 preparedStatement.addBatch();
             }
 

@@ -30,10 +30,14 @@ public class ChunkRegeneration {
     private static int radius = 8;
 
     public static void regenerateChunk(BukkitPositionInfo bukkitPositionInfo) {
-        regenerateChunk(bukkitPositionInfo, IntegrationUtil.getRegenEngine());
+        regenerateChunk(bukkitPositionInfo, IntegrationUtil.getRegenEngine(), false);
     }
 
     public static void regenerateChunk(BukkitPositionInfo bukkitPositionInfo, IEngineIntegration engine) {
+        regenerateChunk(bukkitPositionInfo, engine, false);
+    }
+
+    public static void regenerateChunk(BukkitPositionInfo bukkitPositionInfo, IEngineIntegration engine, boolean bypassClaimCheck) {
         Location location = bukkitPositionInfo.getLocation();
 
         List<NbtWithPos> nbtWithPos = new ArrayList<>();
@@ -63,8 +67,15 @@ public class ChunkRegeneration {
                     for (int y = nmsWrapper.getWorldMinHeight(chunk.getWorld()) + 1; y <= oldChunkSnapshot.getHighestBlockYAt(x, z); y++) {
                         Biome biome = oldChunkSnapshot.getBiome(x, y, z);
 
-                        if (readonlyConfig.ignoredBiomes.contains(biome.getKey().getKey()))
+                        if (readonlyConfig.ignoredBiomes.contains(biome.getKey().getKey())) {
+                            for (x = -radius; x < (radius + 1); x++) {
+                                for (z = -radius; z < (radius + 1); z++) {
+                                    chunk.getWorld().removePluginChunkTicket(chunk.getX() + x, chunk.getZ() + z, instance);
+                                }
+                            }
+
                             return;
+                        }
                     }
                 }
             }
@@ -73,22 +84,24 @@ public class ChunkRegeneration {
         // todo: make this asynchronous.
         List<ILandPluginIntegration> integrations = IntegrationUtil.getLandIntegrations();
 
-        for (ILandPluginIntegration integration : integrations) {
-            if (!integration.checkHasLand(chunk)) continue;
+        if (!bypassClaimCheck) {
+            for (ILandPluginIntegration integration : integrations) {
+                if (!integration.checkHasLand(chunk)) continue;
 
-            for (BlockState blockState : chunk.getTileEntities()) {
-                if (integration.
-                        isInLand(new Location(location.getWorld(), blockState.getX(), blockState.getY(), blockState.getZ()))) {
-                    String nbt = nmsWrapper.getNbtAsString(chunk.getWorld(), blockState);
+                for (BlockState blockState : chunk.getTileEntities()) {
+                    if (integration.
+                            isInLand(new Location(location.getWorld(), blockState.getX(), blockState.getY(), blockState.getZ()))) {
+                        String nbt = nmsWrapper.getNbtAsString(chunk.getWorld(), blockState);
 
-                    nbtWithPos.add(new NbtWithPos(nbt, chunk.getWorld(), blockState.getX(), blockState.getY(), blockState.getZ()));
+                        nbtWithPos.add(new NbtWithPos(nbt, chunk.getWorld(), blockState.getX(), blockState.getY(), blockState.getZ()));
+                    }
                 }
             }
         }
 
         try {
             engine.regenerateChunk(instance, chunk, () -> {
-                regenerateAfterWork(chunk, oldChunkSnapshot, integrations, nbtWithPos);
+                regenerateAfterWork(chunk, oldChunkSnapshot, integrations, nbtWithPos, bypassClaimCheck);
             });
         } catch (Exception ex) {
             NatureReviveComponentLogger.warning("NatureRevive 在重生世界 %s 區塊 (%d, %d) 時遇到了問題。",
@@ -97,7 +110,7 @@ public class ChunkRegeneration {
         }
     }
 
-    private static void regenerateAfterWork(Chunk chunk, ChunkSnapshot oldChunkSnapshot, List<ILandPluginIntegration> integrations, List<NbtWithPos> nbtWithPos) {
+    private static void regenerateAfterWork(Chunk chunk, ChunkSnapshot oldChunkSnapshot, List<ILandPluginIntegration> integrations, List<NbtWithPos> nbtWithPos, boolean bypassClaimCheck) {
         for (int x = -radius; x < (radius + 1); x++) {
             for (int z = -radius; z < (radius + 1); z++) {
                 chunk.getWorld().removePluginChunkTicket(chunk.getX() + x, chunk.getZ() + z, instance);
@@ -116,7 +129,7 @@ public class ChunkRegeneration {
 
                 StructureRegeneration.savingMovableStructure(chunk, oldChunkSnapshot);
 
-                if (!integrations.isEmpty())
+                if (!integrations.isEmpty() && !bypassClaimCheck)
                     landOldStateRevert(integrations, chunk, oldChunkSnapshot, nbtWithPos);
 
                 if (!IntegrationUtil.getLoggingIntegrations().isEmpty())
@@ -127,7 +140,7 @@ public class ChunkRegeneration {
 
             StructureRegeneration.savingMovableStructure(chunk, oldChunkSnapshot);
 
-            if (!integrations.isEmpty())
+            if (!integrations.isEmpty() && !bypassClaimCheck)
                 landOldStateRevert(integrations, chunk, oldChunkSnapshot, nbtWithPos);
 
             if (IntegrationUtil.hasValidLoggingIntegration())

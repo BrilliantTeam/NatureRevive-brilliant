@@ -42,7 +42,7 @@ public class ObfuscateLootListener implements Listener {
                 return;
             }
 
-            if (!Objects.equals(craftChest.getLootTable(), LootTables.EMPTY.getLootTable())) {
+            if (craftChest.getLootTable() != null) {
                 NatureReviveComponentLogger.debug("Lootable Chest re-seeded as %s.", TextColor.fromHexString("#AAAAAA"),
                         craftChest.getLootTable());
 

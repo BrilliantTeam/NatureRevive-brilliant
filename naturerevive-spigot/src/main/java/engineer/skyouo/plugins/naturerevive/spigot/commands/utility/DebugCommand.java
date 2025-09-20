@@ -4,13 +4,21 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.MySQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
+import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +26,8 @@ public class DebugCommand implements SubCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        /*
         sender.sendMessage("============================");
         sender.sendMessage("Queue tasks: ");
         for (Iterator<BukkitPositionInfo> it = NatureRevivePlugin.queue.iterator(); it.hasNext(); ) {
@@ -43,6 +53,42 @@ public class DebugCommand implements SubCommand {
 
         sender.sendMessage("Time now is: " + System.currentTimeMillis());
         sender.sendMessage("============================");
+        return true;
+         */
+
+        sender.sendMessage("NatureRevive 運行狀態:\n");
+        sender.sendMessage("- 隊列大小: " + NatureRevivePlugin.queue.size());
+
+        if ((sender instanceof Player player)) {
+            BukkitPositionInfo positionInfo = NatureRevivePlugin.databaseConfig.get(player.getLocation());
+            Chunk pChunk = player.getChunk();
+
+            if (positionInfo == null) return true;
+
+            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(positionInfo.getTTL()), ZoneId.systemDefault());
+            // Duration duration = Duration.of(NatureRevivePlugin.readonlyConfig.ttlDuration, ChronoUnit.MILLIS);
+
+            // sender.sendMessage("- 您腳下的 chunk 之標記日期: " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(time));
+            sender.sendMessage("- 您腳下的 chunk 之重生日期: " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(time));
+
+
+            int i = 0;
+            BukkitPositionInfo bPosition = null;
+            for (Iterator<BukkitPositionInfo> it = NatureRevivePlugin.queue.iterator(); it.hasNext(); ) {
+                i++;
+                BukkitPositionInfo task = it.next();
+
+                if (task.getX() == pChunk.getX() && task.getZ() == pChunk.getZ()) {
+                    bPosition = task;
+                    break;
+                }
+            }
+
+            sender.sendMessage("- 您腳下的 chunk 於隊列的位置為: " + (bPosition == null ? "無" : "第 %d 個".formatted(i)));
+        } else {
+            sender.sendMessage("- 您腳下的 chunk 之標記日期: 未被標記");
+        }
+
         return true;
     }
 

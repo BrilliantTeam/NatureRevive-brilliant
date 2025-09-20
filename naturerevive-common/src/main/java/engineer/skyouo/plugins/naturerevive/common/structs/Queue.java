@@ -1,7 +1,6 @@
 package engineer.skyouo.plugins.naturerevive.common.structs;
 
-import java.util.ArrayDeque;
-import java.util.Iterator;
+import java.util.*;
 
 public class Queue<T> {
     private java.util.Queue<T> taskQueue;
@@ -10,7 +9,7 @@ public class Queue<T> {
         taskQueue = new ArrayDeque<>();
     }
 
-    public Queue(java.util.Queue queue) { taskQueue = queue; }
+    public Queue(java.util.Queue<T> queue) { taskQueue = queue; }
 
     public void add(T task) {
         taskQueue.offer(task);
@@ -21,7 +20,7 @@ public class Queue<T> {
     }
 
     public boolean hasNext() {
-        return taskQueue.size() > 0;
+        return !taskQueue.isEmpty();
     }
 
     public int size() {
@@ -30,7 +29,15 @@ public class Queue<T> {
 
     public Iterator<T> iterator() { return taskQueue.iterator(); }
 
-    public void load(java.util.Queue queue) { taskQueue = queue; }
+    public void load(java.util.Queue<T> queue) { taskQueue = queue; }
 
-    public Queue<T> clone() { return new Queue<>(((ArrayDeque) taskQueue).clone()); }
+    public Queue<T> clone() {
+        if (taskQueue instanceof ArrayDeque<T> aDeque) {
+            return new Queue<>(aDeque.clone());
+        } else if (taskQueue instanceof PriorityQueue<T> pQueue) {
+            return new Queue<>(new PriorityQueue<>(pQueue));
+        }
+
+        return null;
+    }
 }

@@ -21,7 +21,7 @@ public class ReadonlyConfig {
 
     private YamlFile configuration;
 
-    public final int CONFIG_VERSION = 17;
+    public final int CONFIG_VERSION = 18;
 
     public boolean debug;
 
@@ -90,6 +90,8 @@ public class ReadonlyConfig {
     public String regenerationEngine;
 
     public List<String> ignoredWorld;
+
+    public List<String> allowedWorld;
 
     public List<String> ignoredBiomes;
 
@@ -174,7 +176,7 @@ public class ReadonlyConfig {
                     "Whether to enable the experimental function that if the expired chunk has GriefDefender in it, put all blocks in GriefDefender's claims to new chunk instead of skipping chunk.",
                     "Demo: https://www.youtube.com/watch?v=41RAkj97fJY&list=PLiqb-2W5wSDFvBwnNJCtt_O-kIem40iDG&index=9")));
 
-            configuration.set("coreprotect-logging-enable", false);
+            configuration.set("coreprotect-logging-enable", true);
             configuration.setComment("coreprotect-logging-enable", convertListStringToString(Arrays.asList("是否啟用 CoreProtect 的紀錄功能.",
                     "Whether or not to enable the CoreProtect logging integration.")));
 
@@ -291,6 +293,15 @@ public class ReadonlyConfig {
             configuration.setComment("blacklist-worlds", convertListStringToString(Arrays.asList(
                     "該列表內的世界將會被重生系統忽略, 並將不會再生.",
                     "The list of ignored world that will be skipped by regeneration system."
+            )));
+
+            configuration.set("whitelist-worlds", List.of());
+            configuration.setComment("whitelist-worlds", convertListStringToString(Arrays.asList(
+                    "倘若該列表內有填寫任何世界名稱，NatureRevive 將只會重生該名單內的世界，",
+                    "倘若列表內的世界同樣在 blacklist-worlds 內，那麼將會被忽略。",
+                    "The list of allowed world that will be skipped by regeneration system,",
+                    "if the list is empty, all worlds will be allow to perform regen task",
+                    "if any world in list is also in blacklist-worlds, the world will not perform task."
             )));
 
             configuration.set("blacklist-biomes", Arrays.asList("naturerevive"));
@@ -664,6 +675,17 @@ public class ReadonlyConfig {
                 configuration.set("messages.start-regeneration", "&a開啟區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive pause");
                 configuration.setComment("messages.start-regeneration", convertListStringToString(Arrays.asList("當區塊重生系統被重新開啟時，向指令執行者傳送的訊息.",
                         "The message to be sent on plugin's chunk regeneration system was turned on again.")));
+            case 17:
+                configuration.set("whitelist-worlds", List.of());
+                configuration.setComment("whitelist-worlds", convertListStringToString(Arrays.asList(
+                        "倘若該列表內有填寫任何世界名稱，NatureRevive 將只會重生該名單內的世界，",
+                        "倘若列表內的世界同樣在 blacklist-worlds 內，那麼將會被忽略。",
+                        "The list of allowed world that will be skipped by regeneration system,",
+                        "if the list is empty, all worlds will be allow to perform regen task",
+                        "if any world in list is also in blacklist-worlds, the world will not perform task."
+                )));
+
+                configuration.set("coreprotect-logging-enable", true);
             default:
                 configuration.set("config-version", CONFIG_VERSION);
                 try {
@@ -678,54 +700,55 @@ public class ReadonlyConfig {
         this.configuration = YamlFile.loadConfiguration(file);
 
         debug = configuration.getBoolean("debug", false);
-        residenceStrictCheck = configuration.getBoolean("residence-strict-check", false);
-        griefPreventionStrictCheck = configuration.getBoolean("griefprevention-strict-check", false);
-        griefDefenderStrictCheck = configuration.getBoolean("griefdefender-strict-check", false);
+        residenceStrictCheck = configuration.getBoolean("residence-strict-check", false); // new options: lands.strict
+        griefPreventionStrictCheck = configuration.getBoolean("griefprevention-strict-check", false); // new options: lands.strict
+        griefDefenderStrictCheck = configuration.getBoolean("griefdefender-strict-check", false); // new options: lands.strict
 
-        saferOreObfuscation = configuration.getBoolean("safer-ore-obfuscation", false);
-        adaptiveLootChestReplacement = configuration.getBoolean("adaptive-loot-chest-replacement", false);
-        suppressNearbyChunkCount = configuration.getInt("suppress-chunk-refresh-radius", 0);
-        coreProtectLogging = configuration.getBoolean("coreprotect-logging-enable", false);
-        enableOreObfuscation = configuration.getBoolean("enable-ore-obfuscation", false);
+        saferOreObfuscation = configuration.getBoolean("safer-ore-obfuscation", false); // ore-obfuscation.safer
+        adaptiveLootChestReplacement = configuration.getBoolean("adaptive-loot-chest-replacement", false); // loot-chest.enable-prefill inverse
+        suppressNearbyChunkCount = configuration.getInt("suppress-chunk-refresh-radius", 0); // regenerate-track-nearby-n-chunks
+        coreProtectLogging = configuration.getBoolean("coreprotect-logging-enable", true); // new-options: logging.disable
+        enableOreObfuscation = configuration.getBoolean("enable-ore-obfuscation", false); // ore-obfuscation.enable
 
-        taskPerProcess = configuration.getInt("task-process-per-tick", 1);
-        queuePerNTick = configuration.getInt("queue-process-per-n-tick", 200);
-        checkChunkTTLTick = configuration.getInt("check-chunk-ttl-per-n-tick", 200);
-        dataSaveTime = configuration.getInt("data-save-time-tick", 3600);
-        blockPutPerTick = configuration.getInt("block-put-per-tick", 1024);
-        blockPutActionPerNTick = configuration.getInt("block-put-action-per-n-tick", 10);
+        taskPerProcess = configuration.getInt("task-process-per-tick", 1); // regenerate-n-chunks-per-time
+        queuePerNTick = configuration.getInt("queue-process-per-n-tick", 200); // regenerate-chunks-per-n-ticks
+        checkChunkTTLTick = configuration.getInt("check-chunk-ttl-per-n-tick", 200); // check-expires-chunks-every-n-ticks
+        dataSaveTime = configuration.getInt("data-save-time-tick", 3600); // save-per-n-ticks
+        blockPutPerTick = configuration.getInt("block-put-per-tick", 1024); // block-process-batch-size
+        blockPutActionPerNTick = configuration.getInt("block-put-action-per-n-tick", 10); // block-process-per-n-ticks
         minTPSCountForRegeneration = configuration.getDouble("min-tps-for-regenerate-chunk", 16.0);
         maxPlayersCountForRegeneration = configuration.getInt("max-players-for-regenerate-chunk", 40);
-        regenerationStrategy = configuration.getString("regeneration-strategy", "passive");
-        regenerationEngine = configuration.getString("regeneration-engine", "bukkit");
-        blockProcessingTick = configuration.getInt("block-queue-process-per-n-tick", 10);
-        blockProcessingAmountPerProcessing = configuration.getInt("block-queue-process-per-time", 200);
-        chunkRegenerateRadiusOnAverageApplied = configuration.getInt("average-chunk-radius", 2);
-        maxElytraPerDay = configuration.getInt("max-elytra-per-day", 10);
+        regenerationStrategy = configuration.getString("regeneration-strategy", "passive"); // strategy
+        regenerationEngine = configuration.getString("regeneration-engine", "bukkit"); // engine
+        blockProcessingTick = configuration.getInt("block-queue-process-per-n-tick", 10); // regenerate-affected-blocks-flag-per-n-tick
+        blockProcessingAmountPerProcessing = configuration.getInt("block-queue-process-per-time", 200); // regenerate-affected-n-blocks-flag-per-tick
+        chunkRegenerateRadiusOnAverageApplied = configuration.getInt("average-chunk-radius", 2); // check-chunk-radius
+        maxElytraPerDay = configuration.getInt("max-elytra-per-day", 10); // todo: Structure part
 
-        ttlDuration = parseDuration(configuration.getString("ttl-duration", "7d"));
+        ttlDuration = parseDuration(configuration.getString("ttl-duration", "7d")); // regenerate-after
         regenOffsetDuration = parseDuration(configuration.getString("regen-offset-max-duration", "0d"));
-        elytraExceedLimitOffsetDuration = parseDuration(configuration.getString("elytra-exceed-limit-offset-duration", "1d"));
-        coreProtectUserName = configuration.getString("coreprotect-log-username", "#資源再生");
-        reloadSuccessMessage = configuration.getString("messages.reload-success-message", "&a成功重載插件配置檔!");
-        reloadFailureMessage = configuration.getString("messages.reload-failure-message", "&c插件配置檔重載失敗, 請查看後台以獲取詳細記錄.");
-        stopChunkRegenerationMessage = configuration.getString("messages.stop-regeneration", "&e關閉區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive resume");
-        startChunkRegenerationMessage = configuration.getString("messages.start-regeneration", "&a開啟區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive pause");
-        forceRegenFailedDueRegenStopMessage = configuration.getString("messages.force-regen-fail-due-to-regeneration-stop", "&c無法在區塊重生系統關閉時強制重生區塊!");
+        elytraExceedLimitOffsetDuration = parseDuration(configuration.getString("elytra-exceed-limit-offset-duration", "1d")); // todo: Structure part
+        coreProtectUserName = configuration.getString("coreprotect-log-username", "#資源再生"); // coreprotect-username
+        reloadSuccessMessage = configuration.getString("messages.reload-success-message", "&a成功重載插件配置檔!"); // same
+        reloadFailureMessage = configuration.getString("messages.reload-failure-message", "&c插件配置檔重載失敗, 請查看後台以獲取詳細記錄."); // same
+        stopChunkRegenerationMessage = configuration.getString("messages.stop-regeneration", "&e關閉區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive resume"); // same
+        startChunkRegenerationMessage = configuration.getString("messages.start-regeneration", "&a開啟區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive pause"); // same
+        forceRegenFailedDueRegenStopMessage = configuration.getString("messages.force-regen-fail-due-to-regeneration-stop", "&c無法在區塊重生系統關閉時強制重生區塊!"); // same
 
-        ignoredWorld = configuration.getStringList("blacklist-worlds");
-        ignoredBiomes = configuration.getStringList("blacklist-biomes");
+        ignoredWorld = configuration.getStringList("blacklist-worlds"); // new options: world-list
+        allowedWorld = configuration.getStringList("whitelist-worlds"); // new options: world-list
+        ignoredBiomes = configuration.getStringList("blacklist-biomes"); // new options: biomes-list
 
-        databaseName = configuration.getString("storage.database-name", "naturerevive");
-        databaseTableName = configuration.getString("storage.table-name", "locations");
-        databaseIp = configuration.getString("storage.database-domain-or-ip", "127.0.0.1");
-        databasePort = configuration.getInt("storage.database-port", 3306);
-        databaseUsername = configuration.getString("storage.database-username", "root");
-        databasePassword = configuration.getString("storage.database-password", "20480727");
-        jdbcConnectionString = configuration.getString("storage.jdbc-connection-string", "jdbc:mysql://{database_ip}:{database_port}/{database_name}");
-        spawnTimer = configuration.getString("spawn-timer","00:00-23:59");
+        databaseName = configuration.getString("storage.database-name", "naturerevive"); // same
+        databaseTableName = configuration.getString("storage.table-name", "locations"); // same
+        databaseIp = configuration.getString("storage.database-domain-or-ip", "127.0.0.1"); // database-hostname
+        databasePort = configuration.getInt("storage.database-port", 3306); // same
+        databaseUsername = configuration.getString("storage.database-username", "root"); // same
+        databasePassword = configuration.getString("storage.database-password", "20480727"); // same
+        jdbcConnectionString = configuration.getString("storage.jdbc-connection-string", "jdbc:mysql://{database_ip}:{database_port}/{database_name}"); // same
+        spawnTimer = configuration.getString("spawn-timer","00:00-23:59"); // regenerate-at
 
-        sqlProcessingCount = configuration.getInt("sql-processing-count", 500);
+        sqlProcessingCount = configuration.getInt("sql-processing-count", 500); // sql-process-batch-size
         if (NatureRevivePlugin.databaseConfig != null) {
             try {
                 NatureRevivePlugin.databaseConfig.save();

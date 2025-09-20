@@ -29,7 +29,8 @@ public class RegenQueueCheckTask implements Task {
                         if (x == z && x == 0)
                             continue;
 
-                        BukkitPositionInfo positionInfo = databaseConfig.get(new BukkitPositionInfo(player.getWorld().getName(), player.getLocation().getChunk().getX() + x, player.getLocation().getChunk().getZ() + z, 0).getLocation());
+                        BukkitPositionInfo positionInfo =
+                                databaseConfig.get(new BukkitPositionInfo(player.getWorld().getName(), player.getLocation().getChunk().getX() + x, player.getLocation().getChunk().getZ() + z, 0).getLocation());
 
                         if (positionInfo == null)
                             continue;
@@ -41,6 +42,8 @@ public class RegenQueueCheckTask implements Task {
                     }
             }
         }
+
+        
     }
 
     @Override
