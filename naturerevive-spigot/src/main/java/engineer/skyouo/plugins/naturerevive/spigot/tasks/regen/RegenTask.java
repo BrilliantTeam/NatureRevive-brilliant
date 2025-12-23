@@ -27,21 +27,23 @@ public class RegenTask implements Task {
 
                 if (readonlyConfig.ignoredWorld.contains(task.getLocation().getWorld().getName()))
                     continue;
-
-                List<ILandPluginIntegration> integrations = IntegrationUtil.getLandIntegrations();
-
-                if (!integrations.isEmpty() &&
-                        integrations.stream().anyMatch(integration -> integration.checkHasLand(task.getLocation().getChunk()) && !integration.isStrictMode()))
-                    continue;
-
+                
                 ScheduleUtil.REGION.runTask(NatureRevivePlugin.instance, task.getLocation(), () -> {
+                    List<ILandPluginIntegration> integrations = IntegrationUtil.getLandIntegrations();
+                    boolean hasLandProtection = !integrations.isEmpty() &&
+                            integrations.stream().anyMatch(integration -> 
+                                integration.checkHasLand(task.getLocation().getChunk()) && !integration.isStrictMode()
+                            );
+
+                    if (hasLandProtection) {
+                        return;
+                    }
                     task.regenerateChunk();
 
                     NatureReviveComponentLogger.debug("%s was regenerated.", TextColor.fromHexString("#AAAAAA"), task);
                 });
             }
         } else {
-            // 未達成 無法生成區塊 清除序列
             while (queue.hasNext()){
                 queue.pop();
             }
@@ -64,7 +66,6 @@ public class RegenTask implements Task {
     }
 
     private boolean isSuitableForChunkRegeneration() {
-        // 新增時間閥
         return Bukkit.getServer().getOnlinePlayers().size() < readonlyConfig.maxPlayersCountForRegeneration && (Util.isFolia() ?
                 Bukkit.getTPS()[0] : nmsWrapper.getRecentTps()[0]) > readonlyConfig.minTPSCountForRegeneration &&
                 enableRevive && readonlyConfig.isCurrentTimeAllowForRSC();

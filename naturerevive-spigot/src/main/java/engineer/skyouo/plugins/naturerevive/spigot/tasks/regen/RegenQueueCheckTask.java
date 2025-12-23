@@ -5,19 +5,33 @@ import engineer.skyouo.plugins.naturerevive.spigot.tasks.Task;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
 import java.util.List;
+import java.sql.SQLException;
 
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
 
 public class RegenQueueCheckTask implements Task {
     @Override
     public void run() {
+        if (databaseConfig == null) return;
+
         if (!readonlyConfig.regenerationStrategy.equalsIgnoreCase("passive") && !readonlyConfig.regenerationStrategy.equalsIgnoreCase("average")) {
-            List<BukkitPositionInfo> positionInfos = databaseConfig.values();
+            List<BukkitPositionInfo> positionInfos;
+            
+            try {
+                positionInfos = databaseConfig.values();
+            } catch (Exception e) {
+                positionInfos = Collections.emptyList();
+            }
+
             for (BukkitPositionInfo positionInfo : positionInfos) {
                 if (positionInfo.isOverTTL()) {
                     queue.add(positionInfo);
-                    databaseConfig.unset(positionInfo);
+                    try {
+                        databaseConfig.unset(positionInfo);
+                    } catch (Exception e) {
+                    }
                 }
             }
         }
@@ -29,21 +43,23 @@ public class RegenQueueCheckTask implements Task {
                         if (x == z && x == 0)
                             continue;
 
-                        BukkitPositionInfo positionInfo =
-                                databaseConfig.get(new BukkitPositionInfo(player.getWorld().getName(), player.getLocation().getChunk().getX() + x, player.getLocation().getChunk().getZ() + z, 0).getLocation());
+                        try {
+                            BukkitPositionInfo positionInfo =
+                                    databaseConfig.get(new BukkitPositionInfo(player.getWorld().getName(), player.getLocation().getChunk().getX() + x, player.getLocation().getChunk().getZ() + z, 0).getLocation());
 
-                        if (positionInfo == null)
-                            continue;
+                            if (positionInfo == null)
+                                continue;
 
-                        if (positionInfo.isOverTTL()) {
-                            queue.add(positionInfo);
-                            databaseConfig.unset(positionInfo);
+                            if (positionInfo.isOverTTL()) {
+                                queue.add(positionInfo);
+                                databaseConfig.unset(positionInfo);
+                            }
+                        } catch (Exception e) {
+                            return; 
                         }
                     }
             }
         }
-
-        
     }
 
     @Override
