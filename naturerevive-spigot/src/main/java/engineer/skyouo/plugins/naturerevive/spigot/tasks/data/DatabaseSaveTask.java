@@ -21,11 +21,16 @@ public class DatabaseSaveTask implements Task {
             int i = 0;
 
             while (sqlCommandQueue.hasNext() && i < readonlyConfig.sqlProcessingCount) {
-                sqlCommands.add(sqlCommandQueue.pop());
-                i++;
+                SQLCommand cmd = sqlCommandQueue.pop();
+                if (cmd != null) {
+                    sqlCommands.add(cmd);
+                    i++;
+                }
             }
 
-            adapter.massExecute(sqlCommands);
+            if (!sqlCommands.isEmpty()) {
+                adapter.massExecute(sqlCommands);
+            }
         } else {
             ScheduleUtil.GLOBAL.runTask(instance, () -> {
                 try {

@@ -79,6 +79,7 @@ public class ObfuscateLootListener implements Listener {
      * @deprecated - Will refactor into "IRegenOreEngineIntegration" in future version.
      * @param chunk
      */
+    @Deprecated
     public static void randomizeChunkOre(Chunk chunk) {
         if (chunk.getWorld().getEnvironment().equals(World.Environment.THE_END)) return; // Does not need since no ore
         Location location = new Location(chunk.getWorld(), chunk.getX() << 4, 256, chunk.getZ() << 4);

@@ -211,6 +211,10 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
             PreparedStatement preparedStatementDelete = connection.prepareStatement("DELETE FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + " WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
 
             for (SQLCommand sqlCommand : sqlCommandList) {
+                if (sqlCommand == null) {
+                    continue;
+                }
+
                 if (sqlCommand.getType().equals(SQLCommand.Type.INSERT)) {
                     preparedStatementInsert.setInt(1, sqlCommand.getBukkitPositionInfo().getX());
                     preparedStatementInsert.setInt(2, sqlCommand.getBukkitPositionInfo().getZ());
