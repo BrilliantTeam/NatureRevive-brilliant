@@ -23,9 +23,9 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
             hikari.setPoolName("NatureReviveMySQLPool");
             hikari.setMaximumPoolSize(10);
             hikari.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
-            hikari.setMaxLifetime(36000000);
+            hikari.setMaxLifetime(1800000);
             hikari.setConnectionTimeout(60000);
-            hikari.setMinimumIdle(20);
+            hikari.setMinimumIdle(10);
             hikari.setRegisterMbeans(true);
 
             hikari.addDataSourceProperty("serverName", NatureRevivePlugin.readonlyConfig.databaseIp);
