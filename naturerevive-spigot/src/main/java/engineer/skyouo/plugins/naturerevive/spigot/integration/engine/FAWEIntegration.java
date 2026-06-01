@@ -3,7 +3,9 @@ package engineer.skyouo.plugins.naturerevive.spigot.integration.engine;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.FaweImplRegeneration;
+import engineer.skyouo.plugins.naturerevive.spigot.util.FoliaRegionContext;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
+import engineer.skyouo.plugins.naturerevive.spigot.util.Util;
 import org.bukkit.Chunk;
 import org.bukkit.plugin.Plugin;
 
@@ -56,10 +58,23 @@ public class FAWEIntegration implements IEngineIntegration {
 
     @Override
     public void regenerateChunk(Plugin plugin, Chunk chunk, Runnable postTask) {
-        ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
-            FaweImplRegeneration.regenerate(chunk, false, () -> {
-                ScheduleUtil.REGION.runTask(plugin, chunk, postTask);
+        if (Util.isFolia()) {
+            ScheduleUtil.REGION.runTask(plugin, chunk, () -> {
+                Object worldData = FoliaRegionContext.capture(chunk.getWorld());
+                ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
+                    FoliaRegionContext.inject(worldData);
+                    try {
+                        FaweImplRegeneration.regenerate(chunk, false, () ->
+                            ScheduleUtil.REGION.runTask(plugin, chunk, postTask));
+                    } finally {
+                        FoliaRegionContext.clear();
+                    }
+                });
             });
-        });
+        } else {
+            ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () ->
+                FaweImplRegeneration.regenerate(chunk, false, () ->
+                    ScheduleUtil.REGION.runTask(plugin, chunk, postTask)));
+        }
     }
 }
