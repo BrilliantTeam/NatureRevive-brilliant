@@ -17,6 +17,10 @@ import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.world.level.ChunkPos;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class NMSHandler1_21 implements INMSWrapper {
@@ -87,5 +91,37 @@ public class NMSHandler1_21 implements INMSWrapper {
     @Override
     public Material[] getOreBlocks() {
         return oreBlocks;
+    }
+
+    @Override
+    public void regenerateChunk(World world, int chunkX, int chunkZ) {
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        ServerChunkCache source = level.getChunkSource();
+        ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+        try {
+            source.chunkMap.write(chunkPos, null);
+        } catch (Throwable t) {
+            reflectiveDeleteChunk(source, chunkPos);
+        }
+        world.unloadChunk(chunkX, chunkZ, false);
+        world.getChunkAt(chunkX, chunkZ);
+    }
+
+    private static void reflectiveDeleteChunk(ServerChunkCache source, ChunkPos pos) {
+        for (Field field : source.getClass().getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object storage = field.get(source);
+                if (storage == null) continue;
+                for (Method method : storage.getClass().getMethods()) {
+                    Class<?>[] params = method.getParameterTypes();
+                    if (method.getName().equals("write") && params.length == 2
+                            && ChunkPos.class.isAssignableFrom(params[0])) {
+                        method.invoke(storage, pos, null);
+                        return;
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
     }
 }

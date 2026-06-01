@@ -29,4 +29,9 @@ public interface INMSWrapper {
     int getWorldMinHeight(World world);
 
     Material[] getOreBlocks();
+
+    @SuppressWarnings("deprecation")
+    default void regenerateChunk(World world, int chunkX, int chunkZ) {
+        world.regenerateChunk(chunkX, chunkZ);
+    }
 }
