@@ -1,0 +1,39 @@
+plugins {
+    id("java-library")
+    id("io.papermc.paperweight.userdev")
+}
+
+
+group = "engineer.skyouo.plugins.naturerevive.spigot.nms"
+version = project.rootProject.version
+
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION
+
+dependencies {
+    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
+
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    compileOnly(project(":naturerevive-common"))
+}
+
+tasks {
+    assemble {
+        dependsOn(reobfJar)
+    }
+
+    compileJava {
+        options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
+
+        // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
+        // See https://openjdk.java.net/jeps/247 for more information.
+        options.release.set(21)
+    }
+
+    javadoc {
+        options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
+    }
+
+    processResources {
+        filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
+    }
+}

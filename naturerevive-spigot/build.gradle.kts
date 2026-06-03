@@ -8,7 +8,7 @@
 
 plugins {
     id("java-library")
-    id("io.github.goooler.shadow") version "8.1.6"
+    id("com.gradleup.shadow") version "9.3.0"
 }
 
 group = "engineer.skyouo.plugins.naturerevive.spigot"
