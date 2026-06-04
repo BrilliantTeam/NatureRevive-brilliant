@@ -6,22 +6,18 @@
 
 ## 📃 License | 開源許可證
 
-**This project is under AGPL v3.0**
-
 **該插件使用 AGPL v3.0 開源許可證**
 
 ## 🔴 dependencies | 依賴前置
 
-**CorePortect (optional) , Residence (optional) , GriefPrevention(optional), FastAsyncWorldEdit (optional)**
-
-**CorePortect (可選)、Residence (可選)、GriefPrevention (可選)、FastAsyncWorldEdit (可選)**
+**CorePortect（可選）、Residence（可選）、GriefPrevention（可選）、FastAsyncWorldEdit（可選，1.21+ 必要）**
 
 ## 🖌Commands | 指令
 ```
 
 /nr forceregenall - 強制再生所有已過期的區塊
 
-/nr regenthischunk - 強制再生當前所在的區塊
+/nr regenthischunk <bukkit/fawe> - 強制再生當前所在的區塊（1.21+ bukkit 會自動停用）
 
 /nr reload - 重新載入插件
 
