@@ -1,6 +1,7 @@
 package engineer.skyouo.plugins.naturerevive.spigot;
 
 import engineer.skyouo.plugins.naturerevive.common.INMSWrapper;
+import engineer.skyouo.plugins.naturerevive.common.VersionUtil;
 import engineer.skyouo.plugins.naturerevive.common.structs.Queue;
 import engineer.skyouo.plugins.naturerevive.spigot.api.IAPIMain;
 import engineer.skyouo.plugins.naturerevive.spigot.api.IIntegrationManager;
@@ -175,6 +176,13 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
                 !readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
             NatureReviveComponentLogger.warning("請將 regeneration-strategy 修正為 bukkit 或 fawe。");
             return false;
+        }
+
+        if (VersionUtil.getVersion()[1] >= 21 &&
+                readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
+            NatureReviveComponentLogger.warning("偵測到伺服器版本為 1.21+，bukkit 再生模式不受支援。");
+            NatureReviveComponentLogger.warning("已自動將再生引擎切換為 FAWE，請確保已安裝 FastAsyncWorldEdit。");
+            readonlyConfig.regenerationEngine = "fawe";
         }
 
         return integrationManager.init(instance);

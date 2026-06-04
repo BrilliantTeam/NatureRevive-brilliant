@@ -7,6 +7,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.IEngineIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
+import engineer.skyouo.plugins.naturerevive.common.VersionUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -77,6 +78,9 @@ public class RegenThisChunkCommand implements SubCommand {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (VersionUtil.getVersion()[1] >= 21) {
+            return List.of("fawe");
+        }
         return List.of("bukkit", "fawe");
     }
 }
