@@ -183,6 +183,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
             NatureReviveComponentLogger.warning("偵測到伺服器版本為 1.21+，bukkit 再生模式不受支援。");
             NatureReviveComponentLogger.warning("已自動將再生引擎切換為 FAWE，請確保已安裝 FastAsyncWorldEdit。");
             readonlyConfig.regenerationEngine = "fawe";
+            readonlyConfig.saveRegenerationEngine("fawe");
 
             if (instance.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
                 NatureReviveComponentLogger.error("伺服器未安裝 FastAsyncWorldEdit，無法啟動 NatureRevive。");

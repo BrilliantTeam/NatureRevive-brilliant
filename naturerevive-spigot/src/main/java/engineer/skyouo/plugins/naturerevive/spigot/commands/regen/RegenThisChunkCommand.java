@@ -41,6 +41,15 @@ public class RegenThisChunkCommand implements SubCommand {
             IEngineIntegration engineIntegration = IntegrationUtil.getRegenEngine();
 
             if (args.length > 0) {
+                if (args[0].equalsIgnoreCase("bukkit") && VersionUtil.getVersion()[1] >= 21) {
+                    sender.sendMessage(
+                            ChatColor.translateAlternateColorCodes(
+                                    '&', "&c伺服器版本為 1.21+，不支援 bukkit 再生引擎，請改用 fawe。"
+                            )
+                    );
+                    return;
+                }
+
                 NatureRevivePlugin.readonlyConfig.regenerationEngine = args[0];
                 engineIntegration = NatureRevivePlugin.integrationManager.getAvailableDependencies(IDependency.Type.ENGINE)
                         .stream()

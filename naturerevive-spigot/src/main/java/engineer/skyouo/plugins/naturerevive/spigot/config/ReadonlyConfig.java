@@ -697,7 +697,8 @@ public class ReadonlyConfig {
     }
 
     public void reloadConfig() throws IOException {
-        this.configuration = YamlFile.loadConfiguration(file);
+        this.configuration = new YamlFile(file);
+        this.configuration.createOrLoadWithComments();
 
         debug = configuration.getBoolean("debug", false);
         residenceStrictCheck = configuration.getBoolean("residence-strict-check", false); // new options: lands.strict
@@ -758,6 +759,15 @@ public class ReadonlyConfig {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void saveRegenerationEngine(String engine) {
+        configuration.set("regeneration-engine", engine);
+        try {
+            configuration.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
