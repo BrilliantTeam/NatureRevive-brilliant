@@ -22,7 +22,6 @@ import net.minecraft.world.level.ChunkPos;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class NMSHandler1_21_3 implements INMSWrapper {
     @Override
@@ -99,59 +98,29 @@ public class NMSHandler1_21_3 implements INMSWrapper {
         ServerLevel level = ((CraftWorld) world).getHandle();
         ServerChunkCache source = level.getChunkSource();
         ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-        world.unloadChunk(chunkX, chunkZ, false);
-        deleteChunkAndFlush(level, source, chunkPos);
-        if (world.isChunkLoaded(chunkX, chunkZ)) {
-            markChunkNotNeedingSave(level, chunkX, chunkZ);
-        } else {
-            world.getChunkAt(chunkX, chunkZ);
-        }
-    }
-
-    private static void markChunkNotNeedingSave(ServerLevel level, int chunkX, int chunkZ) {
         try {
-            Method getChunk = level.getClass().getMethod("getChunk", int.class, int.class);
-            Object chunk = getChunk.invoke(level, chunkX, chunkZ);
-            if (chunk != null) {
-                chunk.getClass().getMethod("setUnsaved", boolean.class).invoke(chunk, false);
-            }
-        } catch (Exception ignored) {}
+            source.chunkMap.write(chunkPos, null);
+        } catch (Throwable t) {
+            reflectiveDeleteChunk(source, chunkPos);
+        }
+        world.unloadChunk(chunkX, chunkZ, false);
+        world.getChunkAt(chunkX, chunkZ);
     }
 
-    private static void deleteChunkAndFlush(ServerLevel level, ServerChunkCache source, ChunkPos pos) {
+    private static void reflectiveDeleteChunk(ServerChunkCache source, ChunkPos pos) {
         for (Field field : source.getClass().getDeclaredFields()) {
             try {
                 field.setAccessible(true);
-                Object chunkMap = field.get(source);
-                if (chunkMap == null) continue;
-                for (Method m : chunkMap.getClass().getMethods()) {
-                    if (m.getName().equals("write") && m.getParameterCount() == 2
-                            && ChunkPos.class.isAssignableFrom(m.getParameterTypes()[0])) {
-                        Object arg = Supplier.class.isAssignableFrom(m.getParameterTypes()[1])
-                                ? (Supplier<?>) () -> null : null;
-                        m.invoke(chunkMap, pos, arg);
-                        flushChunkIO(level, chunkMap);
+                Object storage = field.get(source);
+                if (storage == null) continue;
+                for (Method method : storage.getClass().getMethods()) {
+                    Class<?>[] params = method.getParameterTypes();
+                    if (method.getName().equals("write") && params.length == 2
+                            && ChunkPos.class.isAssignableFrom(params[0])) {
+                        method.invoke(storage, pos, null);
                         return;
                     }
                 }
-            } catch (Exception ignored) {}
-        }
-    }
-
-    private static void flushChunkIO(ServerLevel level, Object chunkMap) {
-        try {
-            chunkMap.getClass().getMethod("flushWorker").invoke(chunkMap);
-            return;
-        } catch (Exception ignored) {}
-        for (String cls : new String[]{
-                "ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO",
-                "ca.spottedleaf.moonrise.patches.chunk_system.io.RegionFileIOThread"}) {
-            try {
-                Class<?> c = Class.forName(cls);
-                try { c.getMethod("flush", ServerLevel.class).invoke(null, level); return; }
-                catch (NoSuchMethodException ignored) {}
-                try { c.getMethod("flush").invoke(null); return; }
-                catch (NoSuchMethodException ignored) {}
             } catch (Exception ignored) {}
         }
     }
