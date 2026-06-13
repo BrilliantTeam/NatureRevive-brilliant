@@ -56,13 +56,7 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     }
 
     public void set(BukkitPositionInfo positionInfo) {
-            boolean hasKey = cache.containsKey(positionInfo.getLocation());
-
-            if (hasKey) {
-                NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.UPDATE));
-            } else {
-                NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.INSERT));
-            }
+            NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.INSERT));
 
             cache.put(positionInfo.getLocation(), positionInfo);
     }
