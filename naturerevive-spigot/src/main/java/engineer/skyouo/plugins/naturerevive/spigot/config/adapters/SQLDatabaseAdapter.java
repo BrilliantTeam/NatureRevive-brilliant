@@ -11,5 +11,5 @@ public interface SQLDatabaseAdapter {
 
     void massInsert(Set<BukkitPositionInfo> positionInfoSet);
 
-    void massExecute(List<SQLCommand> sqlCommandList);
+    boolean massExecute(List<SQLCommand> sqlCommandList);
 }

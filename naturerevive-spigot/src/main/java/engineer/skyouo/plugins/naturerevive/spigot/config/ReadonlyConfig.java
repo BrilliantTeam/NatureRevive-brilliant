@@ -152,7 +152,7 @@ public class ReadonlyConfig {
                             "Checking the expired chunks every n tick(s)")
                     ));
 
-            configuration.set("data-save-time-tick", 3600);
+            configuration.set("data-save-time-tick", 1200);
             configuration.setComment("data-save-time-tick",
                     convertListStringToString(Arrays.asList("每 n 個 tick 將過期的區塊儲存至本地資料庫 (過期的區塊 = 需要被再生的區塊)",
                             "Saving the chunks not over TTL to the local file every n tick(s).")
@@ -714,7 +714,7 @@ public class ReadonlyConfig {
         taskPerProcess = configuration.getInt("task-process-per-tick", 1); // regenerate-n-chunks-per-time
         queuePerNTick = configuration.getInt("queue-process-per-n-tick", 200); // regenerate-chunks-per-n-ticks
         checkChunkTTLTick = configuration.getInt("check-chunk-ttl-per-n-tick", 200); // check-expires-chunks-every-n-ticks
-        dataSaveTime = configuration.getInt("data-save-time-tick", 3600); // save-per-n-ticks
+        dataSaveTime = configuration.getInt("data-save-time-tick", 1200); // save-per-n-ticks
         blockPutPerTick = configuration.getInt("block-put-per-tick", 1024); // block-process-batch-size
         blockPutActionPerNTick = configuration.getInt("block-put-action-per-n-tick", 10); // block-process-per-n-ticks
         minTPSCountForRegeneration = configuration.getDouble("min-tps-for-regenerate-chunk", 16.0);

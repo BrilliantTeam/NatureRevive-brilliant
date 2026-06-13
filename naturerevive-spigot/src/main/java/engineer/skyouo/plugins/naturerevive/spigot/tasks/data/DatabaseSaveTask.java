@@ -1,5 +1,6 @@
 package engineer.skyouo.plugins.naturerevive.spigot.tasks.data;
 
+import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.SQLCommand;
@@ -16,11 +17,13 @@ public class DatabaseSaveTask implements Task {
     @Override
     public void run() {
         if (databaseConfig instanceof SQLDatabaseAdapter adapter) {
+            int limit = readonlyConfig.sqlProcessingCount > 0 ? readonlyConfig.sqlProcessingCount : Integer.MAX_VALUE;
+
             List<SQLCommand> sqlCommands = new ArrayList<>();
 
             int i = 0;
 
-            while (sqlCommandQueue.hasNext() && i < readonlyConfig.sqlProcessingCount) {
+            while (sqlCommandQueue.hasNext() && i < limit) {
                 SQLCommand cmd = sqlCommandQueue.pop();
                 if (cmd != null) {
                     sqlCommands.add(cmd);
@@ -29,7 +32,15 @@ public class DatabaseSaveTask implements Task {
             }
 
             if (!sqlCommands.isEmpty()) {
-                adapter.massExecute(sqlCommands);
+                boolean ok = adapter.massExecute(sqlCommands);
+
+                if (ok) {
+                    NatureReviveComponentLogger.debug("DatabaseSaveTask 已寫入 %d 筆指令至資料庫。", sqlCommands.size());
+                } else {
+                    for (SQLCommand cmd : sqlCommands) {
+                        sqlCommandQueue.add(cmd);
+                    }
+                }
             }
         } else {
             ScheduleUtil.GLOBAL.runTask(instance, () -> {

@@ -10,10 +10,11 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter {
     private Connection connection = null;
-    private Map<Location, BukkitPositionInfo> cache = new HashMap<>();
+    private Map<Location, BukkitPositionInfo> cache = new ConcurrentHashMap<>();
 
     public SQLiteDatabaseAdapter() {
         new File("plugins/NatureRevive").mkdirs();
@@ -52,7 +53,7 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
         if (hasKey) {
             NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.UPDATE));
         } else {
-            NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.DELETE));
+            NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.INSERT));
         }
 
         cache.put(positionInfo.getLocation(), positionInfo);
@@ -162,10 +163,10 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
             for (BukkitPositionInfo positionInfo : positionInfoSet) {
                 cache.put(positionInfo.getLocation(), positionInfo);
 
-                preparedStatement.setInt(0, positionInfo.getX());
-                preparedStatement.setInt(1, positionInfo.getZ());
-                preparedStatement.setLong(2, positionInfo.getTTL());
-                preparedStatement.setString(3, positionInfo.getWorldName());
+                preparedStatement.setLong(1, positionInfo.getTTL());
+                preparedStatement.setInt(2, positionInfo.getX());
+                preparedStatement.setInt(3, positionInfo.getZ());
+                preparedStatement.setString(4, positionInfo.getWorldName());
                 preparedStatement.addBatch();
             }
 
@@ -184,10 +185,10 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
             for (BukkitPositionInfo positionInfo : positionInfoSet) {
                 cache.put(positionInfo.getLocation(), positionInfo);
 
-                preparedStatement.setInt(0, positionInfo.getX());
-                preparedStatement.setInt(1, positionInfo.getZ());
-                preparedStatement.setLong(2, positionInfo.getTTL());
-                preparedStatement.setString(3, positionInfo.getWorldName());
+                preparedStatement.setInt(1, positionInfo.getX());
+                preparedStatement.setInt(2, positionInfo.getZ());
+                preparedStatement.setLong(3, positionInfo.getTTL());
+                preparedStatement.setString(4, positionInfo.getWorldName());
                 preparedStatement.addBatch();
             }
 
@@ -200,9 +201,9 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
     }
 
     @Override
-    public void massExecute(List<SQLCommand> sqlCommandList) {
+    public boolean massExecute(List<SQLCommand> sqlCommandList) {
         try {
-            PreparedStatement preparedStatementInsert = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?);");
+            PreparedStatement preparedStatementInsert = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?) ON CONFLICT(X, Z, WORLDNAME) DO UPDATE SET TTL = excluded.TTL;");
             PreparedStatement preparedStatementUpdate = connection.prepareStatement("UPDATE " + NatureRevivePlugin.readonlyConfig.databaseTableName + " SET TTL = ? WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
             PreparedStatement preparedStatementDelete = connection.prepareStatement("DELETE FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + " WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
 
@@ -233,8 +234,11 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
             preparedStatementInsert.close();
             preparedStatementUpdate.close();
             preparedStatementDelete.close();
+
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

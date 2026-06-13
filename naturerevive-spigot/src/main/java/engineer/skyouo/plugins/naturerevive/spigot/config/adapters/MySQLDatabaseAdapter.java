@@ -11,11 +11,12 @@ import org.bukkit.Location;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter {
     private HikariDataSource hikari;
 
-    private Map<Location, BukkitPositionInfo> cache = new HashMap<>();
+    private Map<Location, BukkitPositionInfo> cache = new ConcurrentHashMap<>();
 
     public MySQLDatabaseAdapter() {
         try {
@@ -55,7 +56,6 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     }
 
     public void set(BukkitPositionInfo positionInfo) {
-        try (Connection connection = hikari.getConnection(); Statement statement = connection.createStatement()) {
             boolean hasKey = cache.containsKey(positionInfo.getLocation());
 
             if (hasKey) {
@@ -65,9 +65,6 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
             }
 
             cache.put(positionInfo.getLocation(), positionInfo);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public void unset(BukkitPositionInfo positionInfo) {
@@ -129,9 +126,6 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
                     .executeQuery("SELECT * FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + ";");
 
             if (resultSet.isClosed())
-                return BukkitPositionInfos;
-
-            if (!resultSet.next())
                 return BukkitPositionInfos;
 
             while (resultSet.next()) {
@@ -204,45 +198,59 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     }
 
     @Override
-    public void massExecute(List<SQLCommand> sqlCommandList) {
-        try (Connection connection = hikari.getConnection()) {
-            PreparedStatement preparedStatementInsert = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?);");
-            PreparedStatement preparedStatementUpdate = connection.prepareStatement("UPDATE " + NatureRevivePlugin.readonlyConfig.databaseTableName + " SET TTL = ? WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
-            PreparedStatement preparedStatementDelete = connection.prepareStatement("DELETE FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + " WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
+    public boolean massExecute(List<SQLCommand> sqlCommandList) {
+        boolean success = true;
+
+        try (Connection connection = hikari.getConnection();
+             PreparedStatement preparedStatementInsert = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE TTL = VALUES(TTL);");
+             PreparedStatement preparedStatementUpdate = connection.prepareStatement("UPDATE " + NatureRevivePlugin.readonlyConfig.databaseTableName + " SET TTL = ? WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
+             PreparedStatement preparedStatementDelete = connection.prepareStatement("DELETE FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + " WHERE X = ? AND Z = ? AND WORLDNAME = ?;")) {
 
             for (SQLCommand sqlCommand : sqlCommandList) {
                 if (sqlCommand == null) {
                     continue;
                 }
 
+                BukkitPositionInfo pos = sqlCommand.getBukkitPositionInfo();
+
                 if (sqlCommand.getType().equals(SQLCommand.Type.INSERT)) {
-                    preparedStatementInsert.setInt(1, sqlCommand.getBukkitPositionInfo().getX());
-                    preparedStatementInsert.setInt(2, sqlCommand.getBukkitPositionInfo().getZ());
-                    preparedStatementInsert.setLong(3, sqlCommand.getBukkitPositionInfo().getTTL());
-                    preparedStatementInsert.setString(4, sqlCommand.getBukkitPositionInfo().getWorldName());
-                    preparedStatementInsert.execute();
-                    preparedStatementInsert.clearParameters();
+                    preparedStatementInsert.setInt(1, pos.getX());
+                    preparedStatementInsert.setInt(2, pos.getZ());
+                    preparedStatementInsert.setLong(3, pos.getTTL());
+                    preparedStatementInsert.setString(4, pos.getWorldName());
+                    preparedStatementInsert.addBatch();
                 } else if (sqlCommand.getType().equals(SQLCommand.Type.UPDATE)) {
-                    preparedStatementUpdate.setLong(1, sqlCommand.getBukkitPositionInfo().getTTL());
-                    preparedStatementUpdate.setInt(2, sqlCommand.getBukkitPositionInfo().getX());
-                    preparedStatementUpdate.setInt(3, sqlCommand.getBukkitPositionInfo().getZ());
-                    preparedStatementUpdate.setString(4, sqlCommand.getBukkitPositionInfo().getWorldName());
-                    preparedStatementUpdate.execute();
-                    preparedStatementUpdate.clearParameters();
+                    preparedStatementUpdate.setLong(1, pos.getTTL());
+                    preparedStatementUpdate.setInt(2, pos.getX());
+                    preparedStatementUpdate.setInt(3, pos.getZ());
+                    preparedStatementUpdate.setString(4, pos.getWorldName());
+                    preparedStatementUpdate.addBatch();
                 } else if (sqlCommand.getType().equals(SQLCommand.Type.DELETE)) {
-                    preparedStatementDelete.setInt(1, sqlCommand.getBukkitPositionInfo().getX());
-                    preparedStatementDelete.setInt(2, sqlCommand.getBukkitPositionInfo().getZ());
-                    preparedStatementDelete.setString(3, sqlCommand.getBukkitPositionInfo().getWorldName());
-                    preparedStatementDelete.execute();
-                    preparedStatementDelete.clearParameters();
+                    preparedStatementDelete.setInt(1, pos.getX());
+                    preparedStatementDelete.setInt(2, pos.getZ());
+                    preparedStatementDelete.setString(3, pos.getWorldName());
+                    preparedStatementDelete.addBatch();
                 }
             }
 
-            preparedStatementInsert.close();
-            preparedStatementUpdate.close();
-            preparedStatementDelete.close();
+            success &= executeBatchSafely(preparedStatementInsert);
+            success &= executeBatchSafely(preparedStatementUpdate);
+            success &= executeBatchSafely(preparedStatementDelete);
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
+        }
+
+        return success;
+    }
+
+    private boolean executeBatchSafely(PreparedStatement statement) {
+        try {
+            statement.executeBatch();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

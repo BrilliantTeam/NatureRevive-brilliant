@@ -1,12 +1,13 @@
 package engineer.skyouo.plugins.naturerevive.common.structs;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Queue<T> {
     private java.util.Queue<T> taskQueue;
 
     public Queue() {
-        taskQueue = new ArrayDeque<>();
+        taskQueue = new ConcurrentLinkedQueue<>();
     }
 
     public Queue(java.util.Queue<T> queue) { taskQueue = queue; }
