@@ -35,7 +35,8 @@ public class DatabaseSaveTask implements Task {
                 boolean ok = adapter.massExecute(sqlCommands);
 
                 if (ok) {
-                    NatureReviveComponentLogger.debug("DatabaseSaveTask 已寫入 %d 筆指令至資料庫。", sqlCommands.size());
+                    int distinctChunks = adapter.collapseToLatestPerChunk(sqlCommands).size();
+                    NatureReviveComponentLogger.debug("DatabaseSaveTask 已處理 %d 筆佇列指令（收斂為 %d 個區塊）寫入資料庫。", sqlCommands.size(), distinctChunks);
                 } else {
                     for (SQLCommand cmd : sqlCommands) {
                         sqlCommandQueue.add(cmd);

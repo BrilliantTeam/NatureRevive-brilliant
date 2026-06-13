@@ -194,17 +194,14 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     @Override
     public boolean massExecute(List<SQLCommand> sqlCommandList) {
         boolean success = true;
+        Map<String, SQLCommand> latestByChunk = collapseToLatestPerChunk(sqlCommandList);
 
         try (Connection connection = hikari.getConnection();
              PreparedStatement preparedStatementInsert = connection.prepareStatement("INSERT INTO " + NatureRevivePlugin.readonlyConfig.databaseTableName + " (X, Z, TTL, WORLDNAME) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE TTL = VALUES(TTL);");
              PreparedStatement preparedStatementUpdate = connection.prepareStatement("UPDATE " + NatureRevivePlugin.readonlyConfig.databaseTableName + " SET TTL = ? WHERE X = ? AND Z = ? AND WORLDNAME = ?;");
              PreparedStatement preparedStatementDelete = connection.prepareStatement("DELETE FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + " WHERE X = ? AND Z = ? AND WORLDNAME = ?;")) {
 
-            for (SQLCommand sqlCommand : sqlCommandList) {
-                if (sqlCommand == null) {
-                    continue;
-                }
-
+            for (SQLCommand sqlCommand : latestByChunk.values()) {
                 BukkitPositionInfo pos = sqlCommand.getBukkitPositionInfo();
 
                 if (sqlCommand.getType().equals(SQLCommand.Type.INSERT)) {
