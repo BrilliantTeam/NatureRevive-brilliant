@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "engineer.skyouo.plugins.naturerevive"
-version = "2.2.4"
+version = "2.2.5"
 
 repositories {
     mavenCentral()

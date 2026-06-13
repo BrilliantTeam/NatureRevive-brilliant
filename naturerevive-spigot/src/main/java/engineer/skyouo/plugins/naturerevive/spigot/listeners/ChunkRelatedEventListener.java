@@ -23,12 +23,17 @@ import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunkRelatedEventListener implements Listener {
     private static UUID emptyUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private static Random random = new Random();
+
+    private static final long FLAG_THROTTLE_MS = 5000L;
+    private static final Map<String, Long> lastFlaggedAt = new ConcurrentHashMap<>();
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockBreakEvent(BlockBreakEvent event) {
         if (event.isCancelled())
@@ -191,8 +196,18 @@ public class ChunkRelatedEventListener implements Listener {
     }
 
     public static void flagChunk(Location location) {
-        if (location == null)
+        if (location == null || location.getWorld() == null)
             return;
+
+        long now = System.currentTimeMillis();
+        String chunkKey = location.getWorld().getName() + ":" + (location.getBlockX() >> 4) + ":" + (location.getBlockZ() >> 4);
+        Long last = lastFlaggedAt.get(chunkKey);
+        if (last != null && now - last < FLAG_THROTTLE_MS)
+            return;
+        lastFlaggedAt.put(chunkKey, now);
+
+        if (lastFlaggedAt.size() > 10000)
+            lastFlaggedAt.entrySet().removeIf(entry -> now - entry.getValue() > FLAG_THROTTLE_MS);
 
         if (!NatureRevivePlugin.readonlyConfig.allowedWorld.isEmpty() &&
                 !NatureRevivePlugin.readonlyConfig.allowedWorld.contains(location.getWorld().getName()))
