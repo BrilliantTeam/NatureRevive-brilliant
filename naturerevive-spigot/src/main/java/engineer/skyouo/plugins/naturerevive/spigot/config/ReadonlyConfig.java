@@ -685,7 +685,7 @@ public class ReadonlyConfig {
                         "if any world in list is also in blacklist-worlds, the world will not perform task."
                 )));
 
-                configuration.set("coreprotect-logging-enable", true);
+                configuration.set("coreprotect-logging-enable", false);
             default:
                 configuration.set("config-version", CONFIG_VERSION);
                 try {
@@ -708,7 +708,7 @@ public class ReadonlyConfig {
         saferOreObfuscation = configuration.getBoolean("safer-ore-obfuscation", false); // ore-obfuscation.safer
         adaptiveLootChestReplacement = configuration.getBoolean("adaptive-loot-chest-replacement", false); // loot-chest.enable-prefill inverse
         suppressNearbyChunkCount = configuration.getInt("suppress-chunk-refresh-radius", 0); // regenerate-track-nearby-n-chunks
-        coreProtectLogging = configuration.getBoolean("coreprotect-logging-enable", true); // new-options: logging.disable
+        coreProtectLogging = configuration.getBoolean("coreprotect-logging-enable", false); // new-options: logging.disable
         enableOreObfuscation = configuration.getBoolean("enable-ore-obfuscation", false); // ore-obfuscation.enable
 
         taskPerProcess = configuration.getInt("task-process-per-tick", 1); // regenerate-n-chunks-per-time
