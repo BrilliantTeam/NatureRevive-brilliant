@@ -22,20 +22,25 @@ public class RegenTask implements Task {
             for (int i = 0; i < readonlyConfig.taskPerProcess && queue.hasNext(); i++) {
                 BukkitPositionInfo task = queue.pop();
 
-                if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getLocation().getWorld().getName()))
+                if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getLocation().getWorld().getName())) {
+                    regenInFlight.remove(task.getChunkKey());
                     continue;
+                }
 
-                if (readonlyConfig.ignoredWorld.contains(task.getLocation().getWorld().getName()))
+                if (readonlyConfig.ignoredWorld.contains(task.getLocation().getWorld().getName())) {
+                    regenInFlight.remove(task.getChunkKey());
                     continue;
-                
+                }
+
                 ScheduleUtil.REGION.runTask(NatureRevivePlugin.instance, task.getLocation(), () -> {
                     List<ILandPluginIntegration> integrations = IntegrationUtil.getLandIntegrations();
                     boolean hasLandProtection = !integrations.isEmpty() &&
-                            integrations.stream().anyMatch(integration -> 
+                            integrations.stream().anyMatch(integration ->
                                 integration.checkHasLand(task.getLocation().getChunk()) && !integration.isStrictMode()
                             );
 
                     if (hasLandProtection) {
+                        regenInFlight.remove(task.getChunkKey());
                         return;
                     }
                     task.regenerateChunk();
@@ -45,7 +50,9 @@ public class RegenTask implements Task {
             }
         } else {
             while (queue.hasNext()){
-                queue.pop();
+                BukkitPositionInfo drained = queue.pop();
+                if (drained != null)
+                    regenInFlight.remove(drained.getChunkKey());
             }
         }
     }

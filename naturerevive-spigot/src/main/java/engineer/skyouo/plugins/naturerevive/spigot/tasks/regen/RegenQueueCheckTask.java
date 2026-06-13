@@ -1,5 +1,6 @@
 package engineer.skyouo.plugins.naturerevive.spigot.tasks.regen;
 
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.Task;
 import org.bukkit.Bukkit;
@@ -27,11 +28,7 @@ public class RegenQueueCheckTask implements Task {
 
             for (BukkitPositionInfo positionInfo : positionInfos) {
                 if (positionInfo.isOverTTL()) {
-                    queue.add(positionInfo);
-                    try {
-                        databaseConfig.unset(positionInfo);
-                    } catch (Exception e) {
-                    }
+                    ChunkRegeneration.enqueue(positionInfo);
                 }
             }
         }
@@ -51,8 +48,7 @@ public class RegenQueueCheckTask implements Task {
                                 continue;
 
                             if (positionInfo.isOverTTL()) {
-                                queue.add(positionInfo);
-                                databaseConfig.unset(positionInfo);
+                                ChunkRegeneration.enqueue(positionInfo);
                             }
                         } catch (Exception e) {
                             return; 

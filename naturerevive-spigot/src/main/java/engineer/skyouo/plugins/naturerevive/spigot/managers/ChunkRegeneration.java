@@ -29,6 +29,29 @@ import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
 public class ChunkRegeneration {
     private static int radius = 8;
 
+    public static boolean enqueue(BukkitPositionInfo bukkitPositionInfo) {
+        if (!regenInFlight.add(bukkitPositionInfo.getChunkKey()))
+            return false;
+
+        queue.add(bukkitPositionInfo);
+        return true;
+    }
+
+    private static void finalizeRegen(String worldName, int chunkX, int chunkZ) {
+        if (databaseConfig != null) {
+            try {
+                databaseConfig.unset(new BukkitPositionInfo(worldName, chunkX, chunkZ, 0));
+            } catch (Exception ignored) {
+            }
+        }
+
+        regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
+    }
+
+    private static void releaseInFlight(String worldName, int chunkX, int chunkZ) {
+        regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
+    }
+
     public static void regenerateChunk(BukkitPositionInfo bukkitPositionInfo) {
         regenerateChunk(bukkitPositionInfo, IntegrationUtil.getRegenEngine(), false);
     }
@@ -55,6 +78,7 @@ public class ChunkRegeneration {
         Chunk chunk = location.getChunk();
 
         if (!location.getWorld().isChunkGenerated(chunk.getX(), chunk.getZ())) {
+            finalizeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
             return;
         }
 
@@ -74,6 +98,7 @@ public class ChunkRegeneration {
                                 }
                             }
 
+                            finalizeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
                             return;
                         }
                     }
@@ -104,6 +129,8 @@ public class ChunkRegeneration {
                 regenerateAfterWork(chunk, oldChunkSnapshot, integrations, nbtWithPos, bypassClaimCheck);
             });
         } catch (Exception ex) {
+            releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+
             NatureReviveComponentLogger.warning("NatureRevive 在重生世界 %s 區塊 (%d, %d) 時遇到了問題。",
                     chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
             ex.printStackTrace();
@@ -116,6 +143,8 @@ public class ChunkRegeneration {
                 chunk.getWorld().removePluginChunkTicket(chunk.getX() + x, chunk.getZ() + z, instance);
             }
         }
+
+        finalizeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 
         if (readonlyConfig.enableOreObfuscation)
             ObfuscateLootListener.randomizeChunkOre(chunk);

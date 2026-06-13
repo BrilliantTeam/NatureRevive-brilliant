@@ -176,7 +176,7 @@ public class ReadonlyConfig {
                     "Whether to enable the experimental function that if the expired chunk has GriefDefender in it, put all blocks in GriefDefender's claims to new chunk instead of skipping chunk.",
                     "Demo: https://www.youtube.com/watch?v=41RAkj97fJY&list=PLiqb-2W5wSDFvBwnNJCtt_O-kIem40iDG&index=9")));
 
-            configuration.set("coreprotect-logging-enable", true);
+            configuration.set("coreprotect-logging-enable", false);
             configuration.setComment("coreprotect-logging-enable", convertListStringToString(Arrays.asList("是否啟用 CoreProtect 的紀錄功能.",
                     "Whether or not to enable the CoreProtect logging integration.")));
 

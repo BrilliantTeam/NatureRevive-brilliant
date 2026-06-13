@@ -5,6 +5,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ILandPluginIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
@@ -189,8 +190,7 @@ public class ChunkRelatedEventListener implements Listener {
                 return;
 
             if (positionInfo.isOverTTL()) {
-                NatureRevivePlugin.queue.add(positionInfo);
-                NatureRevivePlugin.databaseConfig.unset(positionInfo);
+                ChunkRegeneration.enqueue(positionInfo);
             }
         }
     }

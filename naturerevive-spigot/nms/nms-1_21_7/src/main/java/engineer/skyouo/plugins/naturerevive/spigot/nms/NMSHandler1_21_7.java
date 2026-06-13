@@ -24,7 +24,7 @@ import java.util.List;
 public class NMSHandler1_21_7 implements INMSWrapper {
     @Override
     public List<String> getCompatibleNMSVersion() {
-        return List.of("1.21.6", "1.21.7");
+        return List.of("1.21.6", "1.21.7", "1.21.8");
     }
 
     @Override

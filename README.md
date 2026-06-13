@@ -17,7 +17,7 @@
 
 /nr forceregenall - 強制再生所有已過期的區塊
 
-/nr regenthischunk <bukkit/fawe> - 強制再生當前所在的區塊（1.21+ bukkit 會自動停用）
+/nr regenchunk <bukkit/fawe> - 強制再生當前所在的區塊（1.21+ bukkit 會自動停用）
 
 /nr reload - 重新載入插件
 

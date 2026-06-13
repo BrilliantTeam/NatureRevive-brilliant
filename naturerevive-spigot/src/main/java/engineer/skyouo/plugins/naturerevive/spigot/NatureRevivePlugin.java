@@ -40,7 +40,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
     public static boolean enableRevive = true;
@@ -59,6 +61,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
     public static SuspendedZone suspendedZone;
 
     public static Queue<BukkitPositionInfo> queue = null;
+    public static final Set<String> regenInFlight = ConcurrentHashMap.newKeySet();
     public static Queue<Location> blockQueue = new Queue<>();
     public static final Queue<BlockStateWithPos> blockStateWithPosQueue = new Queue<>();
     public static final Queue<BlockDataChangeWithPos> blockDataChangeWithPos = new Queue<>();

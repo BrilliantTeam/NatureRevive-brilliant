@@ -58,6 +58,10 @@ public final class BukkitPositionInfo extends PositionInfo implements Configurat
         return worldName;
     }
 
+    public String getChunkKey() {
+        return worldName + ":" + x + ":" + z;
+    }
+
     public void setTTL(long ttl) {
         this.ttl = ttl;
     }

@@ -2,6 +2,7 @@ package engineer.skyouo.plugins.naturerevive.spigot.commands.regen;
 
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -32,8 +33,7 @@ public class ForceRegenAllCommand implements SubCommand {
         List<BukkitPositionInfo> positionInfos = NatureRevivePlugin.databaseConfig.values();
         for (BukkitPositionInfo positionInfo : positionInfos) {
             positionInfo.setTTL(0);
-            NatureRevivePlugin.queue.add(positionInfo);
-            NatureRevivePlugin.databaseConfig.unset(positionInfo);
+            ChunkRegeneration.enqueue(positionInfo);
         }
 
         return true;
