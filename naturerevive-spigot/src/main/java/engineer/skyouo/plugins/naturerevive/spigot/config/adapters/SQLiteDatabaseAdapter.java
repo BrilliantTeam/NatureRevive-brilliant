@@ -128,7 +128,7 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
 
         try {
             ResultSet resultSet = connection.createStatement()
-                    .executeQuery("SELECT * FROM locations;");
+                    .executeQuery("SELECT * FROM " + NatureRevivePlugin.readonlyConfig.databaseTableName + ";");
 
             if (resultSet.isClosed())
                 return positionInfos;

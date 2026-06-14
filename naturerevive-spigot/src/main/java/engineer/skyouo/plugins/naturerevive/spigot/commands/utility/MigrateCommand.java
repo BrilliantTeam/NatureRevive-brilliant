@@ -48,8 +48,10 @@ public class MigrateCommand implements SubCommand {
 
         ScheduleUtil.GLOBAL.runTaskAsynchronously(instance, () -> {
 
+            DatabaseConfig config = null;
+
             try {
-                DatabaseConfig config = getDatabase(strings[0]);
+                config = getDatabase(strings[0]);
 
                 if (config.getClass().equals(databaseConfig.getClass())) {
                     commandSender.sendMessage(
@@ -66,18 +68,29 @@ public class MigrateCommand implements SubCommand {
                         )
                 );
 
-                for (BukkitPositionInfo data : NatureRevivePlugin.databaseConfig.values()) {
-                    config.set(data);
-                }
+                List<BukkitPositionInfo> sourceData = NatureRevivePlugin.databaseConfig.values();
 
                 if (config instanceof SQLDatabaseAdapter adapter) {
-                    List<SQLCommand> sqlCommands = new ArrayList<>();
+                    List<SQLCommand> sqlCommands = new ArrayList<>(sourceData.size());
 
-                    while (sqlCommandQueue.hasNext()) {
-                        sqlCommands.add(sqlCommandQueue.pop());
+                    for (BukkitPositionInfo data : sourceData) {
+                        sqlCommands.add(new SQLCommand(data, SQLCommand.Type.INSERT));
                     }
 
-                    adapter.massExecute(sqlCommands);
+                    if (!adapter.massExecute(sqlCommands)) {
+                        commandSender.sendMessage(
+                                ChatColor.translateAlternateColorCodes('&',
+                                        Lang.get("command.migrate.failure")
+                                )
+                        );
+                        return;
+                    }
+                } else {
+                    for (BukkitPositionInfo data : sourceData) {
+                        config.set(data);
+                    }
+
+                    config.save();
                 }
 
                 commandSender.sendMessage(
@@ -93,6 +106,10 @@ public class MigrateCommand implements SubCommand {
                                 Lang.get("command.migrate.failure")
                         )
                 );
+            } finally {
+                if (config != null) {
+                    config.close();
+                }
             }
         });
         return true;
