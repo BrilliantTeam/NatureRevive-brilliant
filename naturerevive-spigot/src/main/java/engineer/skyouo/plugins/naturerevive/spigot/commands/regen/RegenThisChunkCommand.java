@@ -42,7 +42,7 @@ public class RegenThisChunkCommand implements SubCommand {
             IEngineIntegration engineIntegration = IntegrationUtil.getRegenEngine();
 
             if (args.length > 0) {
-                if (args[0].equalsIgnoreCase("bukkit") && VersionUtil.getVersion()[1] >= 21) {
+                if (args[0].equalsIgnoreCase("bukkit") && VersionUtil.isAtLeast(1, 21, 0)) {
                     sender.sendMessage(
                             ChatColor.translateAlternateColorCodes(
                                     '&', Lang.get("command.regenchunk.bukkit-unsupported-1-21")
@@ -88,7 +88,7 @@ public class RegenThisChunkCommand implements SubCommand {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (VersionUtil.getVersion()[1] >= 21) {
+        if (VersionUtil.isAtLeast(1, 21, 0)) {
             return List.of("fawe");
         }
         return List.of("bukkit", "fawe");

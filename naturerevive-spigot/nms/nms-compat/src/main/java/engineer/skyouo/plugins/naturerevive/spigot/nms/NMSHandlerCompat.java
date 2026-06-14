@@ -14,16 +14,14 @@ import java.util.List;
 public class NMSHandlerCompat implements INMSWrapper {
     public static List<Material> materials = new ArrayList<>();
     static {
-        int[] version = VersionUtil.getVersion();
-
         for (Material item : Material.values()) {
             if (item.name().endsWith("ORE")) {
                 if (item.name().startsWith("DEEPSLATE")) {
-                    if (version[1] >= 17) materials.add(item);
+                    if (VersionUtil.isAtLeast(1, 17, 0)) materials.add(item);
                 } else materials.add(item);
             } else {
                 if (item.name().equals("ANCIENT_DEBRIS")) {
-                    if (version[1] >= 16) materials.add(item);
+                    if (VersionUtil.isAtLeast(1, 16, 0)) materials.add(item);
                 }
             }
         }

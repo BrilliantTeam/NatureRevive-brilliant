@@ -21,11 +21,11 @@ public class VersionUtil {
     public static int[] getVersion() {
         int[] version = {0, 0, 0};
         String[] splited = Bukkit.getBukkitVersion().split("-")[0].split("\\.");
-        for (int i = 0; i < splited.length; i++) {
+        for (int i = 0; i < splited.length && i < version.length; i++) {
             try {
                 version[i] = Integer.parseInt(splited[i]);
-            } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-                version[i] = 0;
+            } catch (NumberFormatException e) {
+                break;
             }
         }
 
@@ -34,5 +34,12 @@ public class VersionUtil {
 
     public static boolean isVersionMinorThan(int major) {
         return getVersion()[1] > major;
+    }
+
+    public static boolean isAtLeast(int major, int minor, int patch) {
+        int[] version = getVersion();
+        if (version[0] != major) return version[0] > major;
+        if (version[1] != minor) return version[1] > minor;
+        return version[2] >= patch;
     }
 }

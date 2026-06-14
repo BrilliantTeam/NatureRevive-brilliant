@@ -49,8 +49,6 @@ public class CompatUtil {
     }
 
     public static boolean isRelocated() {
-        int[] version = VersionUtil.getVersion();
-
-        return version[1] > 20 || (version[1] == 20 && version[2] >= 5);
+        return VersionUtil.isAtLeast(1, 20, 5);
     }
 }

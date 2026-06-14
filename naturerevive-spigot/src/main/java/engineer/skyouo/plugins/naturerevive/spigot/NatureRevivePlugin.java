@@ -186,7 +186,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
             return false;
         }
 
-        if (VersionUtil.getVersion()[1] >= 21 &&
+        if (VersionUtil.isAtLeast(1, 21, 0) &&
                 readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
             NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-1"));
             NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-2"));

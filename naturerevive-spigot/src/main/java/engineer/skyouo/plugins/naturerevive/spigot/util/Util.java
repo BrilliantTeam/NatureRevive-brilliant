@@ -25,6 +25,10 @@ public class Util {
     public static INMSWrapper getNMSWrapperInternal() {
         int[] versions = VersionUtil.getVersion();
 
+        if (versions[0] == 26 && versions[1] == 1) {
+            return (INMSWrapper) getClassAndInit(nmsWrapperPrefix + "NMSHandler26_1_2");
+        }
+
         switch (versions[1]) {
             case 17:
                 return (INMSWrapper) getClassAndInit(nmsWrapperPrefix + "NMSHandler1_17");
