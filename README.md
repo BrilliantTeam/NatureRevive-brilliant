@@ -36,7 +36,7 @@
 
 naturerevive.forceregenall - 使用 /nr forceregenall 的權限
 
-naturerevive.regenthischunk - 使用 /nr regenthischunk 的權限
+naturerevive.regenthischunk - 使用 /nr regenchunk 的權限
 
 naturerevive.togglerevive - 使用 /nr pause 與 /nr resume 的權限
 
