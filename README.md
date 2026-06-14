@@ -1,5 +1,6 @@
 # NatureRevive - brilliant | 資源再生，告別資源界！
 遊戲版本：1.17 - 1.21.11
+巴哈介紹：https://forum.gamer.com.tw/C.php?bsn=18673&snA=205249
 ---
 
 [Made for 輝煌伺服器.](https://discord.gg/9c287zPpUZ)
