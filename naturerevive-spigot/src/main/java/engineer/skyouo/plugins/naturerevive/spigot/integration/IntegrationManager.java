@@ -9,6 +9,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefDefende
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefPreventionIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ResidenceIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.logging.CoreProtectIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -42,25 +43,22 @@ public class IntegrationManager implements IIntegrationManager {
 
             if (result) {
                 NatureReviveComponentLogger.info(
-                        "NatureRevive 成功載入 %s 插件的支援項目。",
-                        dependency.getPluginName()
+                        Lang.get("console.integration-loaded", dependency.getPluginName())
                 );
 
                 if (!dependency.getType().equals(IDependency.Type.LAND) && !dependency.isEnabled()) {
                     NatureReviveComponentLogger.info(
-                            "雖然 NatureRevive 發現了 %s 插件，但對應的功能在 NatureRevive 並未被啟用。",
-                            dependency.getPluginName()
+                            Lang.get("console.integration-found-not-enabled", dependency.getPluginName())
                     );
                 }
             }
 
             if (!result && dependency.shouldExitOnFatal()) {
                 NatureReviveComponentLogger.error(
-                        "由於 %s 尚未被載入，且被 NatureRevive 的設置選項依賴，因此無法啟用 NatureRevive。",
-                        dependency.getPluginName()
+                        Lang.get("console.integration-required-missing", dependency.getPluginName())
                 );
 
-                NatureReviveComponentLogger.warning("建議您在設置中關閉相對應的選項，或安裝對應的插件。");
+                NatureReviveComponentLogger.warning(Lang.get("console.integration-required-missing-hint"));
                 return false;
             }
         }

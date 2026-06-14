@@ -1,6 +1,7 @@
 package engineer.skyouo.plugins.naturerevive.spigot.tasks.data;
 
 import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.SQLCommand;
@@ -36,7 +37,7 @@ public class DatabaseSaveTask implements Task {
 
                 if (ok) {
                     int distinctChunks = adapter.collapseToLatestPerChunk(sqlCommands).size();
-                    NatureReviveComponentLogger.debug("DatabaseSaveTask 已處理 %d 筆佇列指令（收斂為 %d 個區塊）寫入資料庫。", sqlCommands.size(), distinctChunks);
+                    NatureReviveComponentLogger.debug(Lang.get("console.database-save-debug", sqlCommands.size(), distinctChunks));
                 } else {
                     for (SQLCommand cmd : sqlCommands) {
                         sqlCommandQueue.add(cmd);

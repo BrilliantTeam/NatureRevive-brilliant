@@ -5,6 +5,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IDependency;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.IEngineIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import engineer.skyouo.plugins.naturerevive.common.VersionUtil;
@@ -30,7 +31,7 @@ public class RegenThisChunkCommand implements SubCommand {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(
                     ChatColor.translateAlternateColorCodes(
-                            '&', "&cYou are not player."
+                            '&', Lang.get("command.regenchunk.not-player")
                     )
             );
             return true;
@@ -44,7 +45,7 @@ public class RegenThisChunkCommand implements SubCommand {
                 if (args[0].equalsIgnoreCase("bukkit") && VersionUtil.getVersion()[1] >= 21) {
                     sender.sendMessage(
                             ChatColor.translateAlternateColorCodes(
-                                    '&', "&c伺服器版本為 1.21+，不支援 bukkit 再生引擎，請改用 fawe。"
+                                    '&', Lang.get("command.regenchunk.bukkit-unsupported-1-21")
                             )
                     );
                     return;
@@ -63,7 +64,7 @@ public class RegenThisChunkCommand implements SubCommand {
             if (engineIntegration == null) {
                 sender.sendMessage(
                         ChatColor.translateAlternateColorCodes(
-                                '&', "&cNo engine found."
+                                '&', Lang.get("command.regenchunk.no-engine")
                         )
                 );
 

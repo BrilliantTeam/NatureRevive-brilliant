@@ -18,6 +18,8 @@ import engineer.skyouo.plugins.naturerevive.spigot.config.ReadonlyConfig;
 import engineer.skyouo.plugins.naturerevive.spigot.constants.OreBlocksCompat;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationManager;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.LanguageManager;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ChunkRelatedEventListener;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ObfuscateLootListener;
 import engineer.skyouo.plugins.naturerevive.spigot.stats.Metrics;
@@ -56,6 +58,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
     public static TaskManager taskManager;
     public static INMSWrapper nmsWrapper;
     public static ReadonlyConfig readonlyConfig;
+    public static LanguageManager languageManager;
     public static DatabaseConfig databaseConfig;
 
     public static SuspendedZone suspendedZone;
@@ -75,14 +78,16 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
             readonlyConfig = new ReadonlyConfig();
         } catch (IOException e) {
             e.printStackTrace();
-            NatureReviveComponentLogger.error("無法載入配置檔案！");
+            NatureReviveComponentLogger.error("無法載入配置檔案！ / Failed to load the configuration file!");
         }
+
+        languageManager = new LanguageManager(this);
 
         try {
             databaseConfig = readonlyConfig.determineDatabase();
         } catch (Exception ex) {
-            NatureReviveComponentLogger.error("&c資料庫初始化失敗！");
-            NatureReviveComponentLogger.warning("&c倘若您使用 MySQL，請確認好您以創建對應的 database。");
+            NatureReviveComponentLogger.error(Lang.get("console.database-init-failed"));
+            NatureReviveComponentLogger.warning(Lang.get("console.database-init-failed-mysql-hint"));
 
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -91,8 +96,8 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
         nmsWrapper = Util.getNMSWrapper();
 
         if (nmsWrapper == null) {
-            NatureReviveComponentLogger.error("&c無法加載 NMS 兼容項目！");
-            NatureReviveComponentLogger.warning("&c您的版本有可能不支援 NatureRevive：" + getServer().getVersion());
+            NatureReviveComponentLogger.error(Lang.get("console.nms-load-failed"));
+            NatureReviveComponentLogger.warning(Lang.get("console.nms-version-unsupported", getServer().getVersion()));
 
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -112,7 +117,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
         integrationManager = new IntegrationManager();
 
         if (!checkSoftDependPlugins()) {
-            NatureReviveComponentLogger.error("由於您於設置中開啟了部分功能，且 NatureRevive 無法載入對應的依賴插件，因此 NatureRevive 將會停止載入。");
+            NatureReviveComponentLogger.error(Lang.get("console.soft-depend-missing"));
             Bukkit.getPluginManager().disablePlugin(this);
 
             return;
@@ -121,7 +126,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
         IntegrationUtil.reloadCache();
 
         if (IntegrationUtil.getRegenEngine() == null) {
-            NatureReviveComponentLogger.error("找不到可用的重生引擎，請您確定是否正確設置 regenerate-engine 選項！");
+            NatureReviveComponentLogger.error(Lang.get("console.no-regen-engine"));
 
             Bukkit.getPluginManager().disablePlugin(this);
 
@@ -129,8 +134,8 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
         }
 
         if (!Util.isPaper()) {
-            NatureReviveComponentLogger.error("您運行的軟體不包含 NatureRevive 運行所需的修補！");
-            NatureReviveComponentLogger.error("建議您切換至 Paper，Paper 是 Spigot 的分支之一，包含眾多優化修補，也不須透過 BuildTools 來獲取軟體構建。");
+            NatureReviveComponentLogger.error(Lang.get("console.not-paper-1"));
+            NatureReviveComponentLogger.error(Lang.get("console.not-paper-2"));
 
             Bukkit.getPluginManager().disablePlugin(this);
 
@@ -177,20 +182,20 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
     public static boolean checkSoftDependPlugins() {
         if (!readonlyConfig.regenerationEngine.equalsIgnoreCase("fawe") &&
                 !readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
-            NatureReviveComponentLogger.warning("請將 regeneration-strategy 修正為 bukkit 或 fawe。");
+            NatureReviveComponentLogger.warning(Lang.get("console.invalid-engine"));
             return false;
         }
 
         if (VersionUtil.getVersion()[1] >= 21 &&
                 readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
-            NatureReviveComponentLogger.warning("偵測到伺服器版本為 1.21+，bukkit 再生模式不受支援。");
-            NatureReviveComponentLogger.warning("已自動將再生引擎切換為 FAWE，請確保已安裝 FastAsyncWorldEdit。");
+            NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-1"));
+            NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-2"));
             readonlyConfig.regenerationEngine = "fawe";
             readonlyConfig.saveRegenerationEngine("fawe");
 
             if (instance.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
-                NatureReviveComponentLogger.error("伺服器未安裝 FastAsyncWorldEdit，無法啟動 NatureRevive。");
-                NatureReviveComponentLogger.error("請安裝 FastAsyncWorldEdit 後重啟伺服器。");
+                NatureReviveComponentLogger.error(Lang.get("console.fawe-not-installed-1"));
+                NatureReviveComponentLogger.error(Lang.get("console.fawe-not-installed-2"));
                 return false;
             }
         }

@@ -7,6 +7,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.MySQLDatabase
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLiteDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.YamlDatabaseAdapter;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.SQLCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
@@ -29,7 +30,7 @@ public class MigrateCommand implements SubCommand {
         if (strings.length != 1) {
             commandSender.sendMessage(
                     ChatColor.translateAlternateColorCodes('&',
-                            "[NatureRevive] &cUsage: /navmigrate <yaml/sqlite/mysql>"
+                            Lang.get("command.migrate.usage")
                     )
             );
             return true;
@@ -38,7 +39,7 @@ public class MigrateCommand implements SubCommand {
         if (!List.of("yaml", "sqlite", "mysql").contains(strings[0])) {
             commandSender.sendMessage(
                     ChatColor.translateAlternateColorCodes('&',
-                            "[NatureRevive] &cUsage: /navmigrate <yaml/sqlite/mysql>"
+                            Lang.get("command.migrate.usage")
                     )
             );
             return true;
@@ -53,7 +54,7 @@ public class MigrateCommand implements SubCommand {
                 if (config.getClass().equals(databaseConfig.getClass())) {
                     commandSender.sendMessage(
                             ChatColor.translateAlternateColorCodes('&',
-                                    "[NatureRevive] &cThere's no need to migrate to the same database storage type!"
+                                    Lang.get("command.migrate.same-storage")
                             )
                     );
                     return;
@@ -61,10 +62,7 @@ public class MigrateCommand implements SubCommand {
 
                 commandSender.sendMessage(
                         ChatColor.translateAlternateColorCodes('&',
-                                String.format(
-                                        "[NatureRevive] &bBegin to migrate to %s, the old data will be still available.",
-                                        strings[0]
-                                )
+                                Lang.get("command.migrate.begin", strings[0])
                         )
                 );
 
@@ -84,7 +82,7 @@ public class MigrateCommand implements SubCommand {
 
                 commandSender.sendMessage(
                         ChatColor.translateAlternateColorCodes('&',
-                                "[NatureRevive] &bMigrate successfully, please restart the plugin and switch the storage method in config.yml."
+                                Lang.get("command.migrate.success")
                         )
                 );
             } catch (Exception ex) {
@@ -92,7 +90,7 @@ public class MigrateCommand implements SubCommand {
 
                 commandSender.sendMessage(
                         ChatColor.translateAlternateColorCodes('&',
-                                "[NatureRevive] &cFailed to migrate, please see console, and edit your config."
+                                Lang.get("command.migrate.failure")
                         )
                 );
             }

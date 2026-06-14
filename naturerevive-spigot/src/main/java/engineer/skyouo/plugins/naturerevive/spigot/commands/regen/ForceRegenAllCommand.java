@@ -2,6 +2,7 @@ package engineer.skyouo.plugins.naturerevive.spigot.commands.regen;
 
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import org.bukkit.ChatColor;
@@ -24,7 +25,7 @@ public class ForceRegenAllCommand implements SubCommand {
         if (!NatureRevivePlugin.enableRevive) {
             sender.sendMessage(
                     ChatColor.translateAlternateColorCodes(
-                            '&', NatureRevivePlugin.readonlyConfig.forceRegenFailedDueRegenStopMessage
+                            '&', Lang.get("messages.force-regen-fail-due-to-regeneration-stop")
                     )
             );
             return true;

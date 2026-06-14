@@ -49,9 +49,17 @@ dependencies {
 }
 
 tasks {
+    val copyReleaseJar by registering(Copy::class) {
+        dependsOn(shadowJar)
+        from(shadowJar.flatMap { it.archiveFile })
+        into(layout.buildDirectory.dir("libs"))
+        rename { "NatureRevive-${project.version}.jar" }
+    }
+
     assemble {
         dependsOn(processResources)
         dependsOn(shadowJar)
+        dependsOn(copyReleaseJar)
     }
 
     shadowJar {

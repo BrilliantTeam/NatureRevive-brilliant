@@ -1,50 +1,49 @@
-# NatureRevive - brilliant | 資源再生，告別資源界！
-遊戲版本：1.17 - 1.21.11
-巴哈介紹：https://forum.gamer.com.tw/C.php?bsn=18673&snA=205249
----
+# NatureRevive - brilliant | Resource Regeneration, Say Goodbye to the Resource World!
+## Game Version: 1.17 - 1.21.11    
+Chinese  Introduction: [https://forum.gamer.com.tw/C.php?bsn=18673&snA=205249](https://forum.gamer.com.tw/C.php?bsn=18673&snA=205249)    
 
-[Made for 輝煌伺服器.](https://discord.gg/9c287zPpUZ)
+[Made for Brilliant Server.](https://discord.gg/9c287zPpUZ)
 
-## 📃 License | 開源許可證
+## 📃 License
 
-**該插件使用 AGPL v3.0 開源許可證**
+**This plugin is open-source under the AGPL v3.0 license.**
 
-## 🔴 dependencies | 依賴前置
+## 🔴 Dependencies
 
-**CorePortect（可選）、Residence（可選）、GriefPrevention（可選）、FastAsyncWorldEdit（可選，1.21+ 必要）**
+**CoreProtect (Optional), Residence (Optional), GriefPrevention (Optional), FastAsyncWorldEdit (Optional, Required for 1.21+)**
 
-## 🖌Commands | 指令
-```
-
-/nr forceregenall - 強制再生所有已過期的區塊
-
-/nr regenchunk <bukkit/fawe> - 強制再生當前所在的區塊（1.21+ bukkit 會自動停用）
-
-/nr reload - 重新載入插件
-
-/nr pause - 暫停資源再生流程
-
-/nr resume - 開啟資源再生流程
-
-/nr migrate <yaml/sqlite/mysql> - 將資料庫遷移到指定的數據庫
-
-/nr debug - debug 訊息，非必要時請勿使用
+## 🖌 Commands
 
 ```
+/nr forceregenall - Forcefully regenerate all expired chunks
 
-## 🔓Permissions | 權限
+/nr regenchunk <bukkit/fawe> - Forcefully regenerate the chunk you are currently in (bukkit will be automatically disabled in 1.21+)
+
+/nr reload - Reload the plugin
+
+/nr pause - Pause the resource regeneration process
+
+/nr resume - Resume the resource regeneration process
+
+/nr migrate <yaml/sqlite/mysql> - Migrate the database to the specified database type
+
+/nr debug - Debug messages, do not use unless necessary
+
 ```
 
-naturerevive.forceregenall - 使用 /nr forceregenall 的權限
+## 🔓 Permissions
 
-naturerevive.regenthischunk - 使用 /nr regenchunk 的權限
+```
+naturerevive.forceregenall - Permission to use /nr forceregenall
 
-naturerevive.togglerevive - 使用 /nr pause 與 /nr resume 的權限
+naturerevive.regenthischunk - Permission to use /nr regenchunk
 
-naturerevive.reloadreviveconfig - 使用 /nr reload 的權限
+naturerevive.togglerevive - Permission to use /nr pause and /nr resume
 
-naturerevive.navmigrate- 使用 /nr migrate 的權限
+naturerevive.reloadreviveconfig - Permission to use /nr reload
 
-naturerevive.debug - 使用 /nr debug 的權限
+naturerevive.navmigrate - Permission to use /nr migrate
+
+naturerevive.debug - Permission to use /nr debug
 
 ```

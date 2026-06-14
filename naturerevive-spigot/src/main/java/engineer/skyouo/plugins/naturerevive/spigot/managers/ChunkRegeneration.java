@@ -1,6 +1,7 @@
 package engineer.skyouo.plugins.naturerevive.spigot.managers;
 
 import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.constants.OreBlocksCompat;
 import engineer.skyouo.plugins.naturerevive.spigot.events.ChunkRegenEvent;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
@@ -131,8 +132,8 @@ public class ChunkRegeneration {
         } catch (Exception ex) {
             releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 
-            NatureReviveComponentLogger.warning("NatureRevive 在重生世界 %s 區塊 (%d, %d) 時遇到了問題。",
-                    chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+            NatureReviveComponentLogger.warning(Lang.get("console.chunk-regen-error",
+                    chunk.getWorld().getName(), chunk.getX(), chunk.getZ()));
             ex.printStackTrace();
         }
     }

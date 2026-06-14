@@ -1,0 +1,56 @@
+# NatureRevive 語言檔（繁體中文）
+# 此檔案於 config.yml 的 language 選項設為 zh_TW 時生效。
+# 顏色代碼請使用 &（例如 &a、&c）。%s / %d 為佔位符，請勿移除。
+
+# 玩家指令訊息
+messages:
+  reload-success: "&a成功重載插件配置檔！"
+  reload-failure: "&c插件配置檔重載失敗，請查看後台以獲取詳細記錄。"
+  stop-regeneration: "&e關閉區塊重生系統成功，倘若想要再次開啟，請執行 /naturerevive resume"
+  start-regeneration: "&a開啟區塊重生系統成功，倘若想要再次關閉，請執行 /naturerevive pause"
+  force-regen-fail-due-to-regeneration-stop: "&c無法在區塊重生系統關閉時強制重生區塊！"
+
+# 各指令的訊息
+command:
+  regenchunk:
+    not-player: "&c你必須是玩家才能執行此指令。"
+    bukkit-unsupported-1-21: "&c伺服器版本為 1.21+，不支援 bukkit 再生引擎，請改用 fawe。"
+    no-engine: "&c找不到可用的再生引擎。"
+  debug:
+    status-header: "NatureRevive 運行狀態：\n"
+    queue-size: "- 隊列大小：%s"
+    chunk-regen-date: "- 您腳下的 chunk 之重生日期：%s"
+    chunk-queue-position: "- 您腳下的 chunk 於隊列的位置為：%s"
+    queue-position-none: "無"
+    queue-position-nth: "第 %d 個"
+    chunk-mark-date-unmarked: "- 您腳下的 chunk 之標記日期：未被標記"
+  migrate:
+    usage: "[NatureRevive] &c用法：/naturerevive migrate <yaml/sqlite/mysql>"
+    same-storage: "[NatureRevive] &c無需遷移至相同的資料庫儲存類型！"
+    begin: "[NatureRevive] &b開始遷移至 %s，舊資料仍會保留。"
+    success: "[NatureRevive] &b遷移成功，請重新啟動插件並於 config.yml 切換儲存方式。"
+    failure: "[NatureRevive] &c遷移失敗，請查看主控台並檢查您的設定檔。"
+
+# 控制台訊息
+console:
+  database-init-failed: "&c資料庫初始化失敗！"
+  database-init-failed-mysql-hint: "&c倘若您使用 MySQL，請確認好您以創建對應的 database。"
+  nms-load-failed: "&c無法加載 NMS 兼容項目！"
+  nms-version-unsupported: "&c您的版本有可能不支援 NatureRevive：%s"
+  soft-depend-missing: "由於您於設置中開啟了部分功能，且 NatureRevive 無法載入對應的依賴插件，因此 NatureRevive 將會停止載入。"
+  no-regen-engine: "找不到可用的重生引擎，請您確定是否正確設置 regenerate-engine 選項！"
+  not-paper-1: "您運行的軟體不包含 NatureRevive 運行所需的修補！"
+  not-paper-2: "建議您切換至 Paper，Paper 是 Spigot 的分支之一，包含眾多優化修補，也不須透過 BuildTools 來獲取軟體構建。"
+  invalid-engine: "請將 regeneration-strategy 修正為 bukkit 或 fawe。"
+  bukkit-unsupported-1-21-1: "偵測到伺服器版本為 1.21+，bukkit 再生模式不受支援。"
+  bukkit-unsupported-1-21-2: "已自動將再生引擎切換為 FAWE，請確保已安裝 FastAsyncWorldEdit。"
+  fawe-not-installed-1: "伺服器未安裝 FastAsyncWorldEdit，無法啟動 NatureRevive。"
+  fawe-not-installed-2: "請安裝 FastAsyncWorldEdit 後重啟伺服器。"
+  integration-loaded: "NatureRevive 成功載入 %s 插件的支援項目。"
+  integration-found-not-enabled: "雖然 NatureRevive 發現了 %s 插件，但對應的功能在 NatureRevive 並未被啟用。"
+  integration-required-missing: "由於 %s 尚未被載入，且被 NatureRevive 的設置選項依賴，因此無法啟用 NatureRevive。"
+  integration-required-missing-hint: "建議您在設置中關閉相對應的選項，或安裝對應的插件。"
+  nms-compat-fallback-1: "由於 NatureRevive 尚未對該 Paper 版本：%s 原生支援，"
+  nms-compat-fallback-2: "將嘗試使用兼容層 NMSHandlerCompat，該模式下，有可能出現錯誤或性能下降。"
+  chunk-regen-error: "NatureRevive 在重生世界 %s 區塊（%d，%d）時遇到了問題。"
+  database-save-debug: "DatabaseSaveTask 已處理 %d 筆佇列指令（收斂為 %d 個區塊）寫入資料庫。"

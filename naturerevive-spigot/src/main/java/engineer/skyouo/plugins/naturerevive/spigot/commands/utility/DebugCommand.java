@@ -3,6 +3,7 @@ package engineer.skyouo.plugins.naturerevive.spigot.commands.utility;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.MySQLDatabaseAdapter;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import org.bukkit.Chunk;
 import org.bukkit.command.Command;
@@ -56,8 +57,8 @@ public class DebugCommand implements SubCommand {
         return true;
          */
 
-        sender.sendMessage("NatureRevive 運行狀態:\n");
-        sender.sendMessage("- 隊列大小: " + NatureRevivePlugin.queue.size());
+        sender.sendMessage(Lang.get("command.debug.status-header"));
+        sender.sendMessage(Lang.get("command.debug.queue-size", NatureRevivePlugin.queue.size()));
 
         if ((sender instanceof Player player)) {
             BukkitPositionInfo positionInfo = NatureRevivePlugin.databaseConfig.get(player.getLocation());
@@ -68,8 +69,8 @@ public class DebugCommand implements SubCommand {
             LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(positionInfo.getTTL()), ZoneId.systemDefault());
             // Duration duration = Duration.of(NatureRevivePlugin.readonlyConfig.ttlDuration, ChronoUnit.MILLIS);
 
-            // sender.sendMessage("- 您腳下的 chunk 之標記日期: " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(time));
-            sender.sendMessage("- 您腳下的 chunk 之重生日期: " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(time));
+            sender.sendMessage(Lang.get("command.debug.chunk-regen-date",
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(time)));
 
 
             int i = 0;
@@ -84,9 +85,12 @@ public class DebugCommand implements SubCommand {
                 }
             }
 
-            sender.sendMessage("- 您腳下的 chunk 於隊列的位置為: " + (bPosition == null ? "無" : "第 %d 個".formatted(i)));
+            sender.sendMessage(Lang.get("command.debug.chunk-queue-position",
+                    bPosition == null
+                            ? Lang.get("command.debug.queue-position-none")
+                            : Lang.get("command.debug.queue-position-nth", i)));
         } else {
-            sender.sendMessage("- 您腳下的 chunk 之標記日期: 未被標記");
+            sender.sendMessage(Lang.get("command.debug.chunk-mark-date-unmarked"));
         }
 
         return true;

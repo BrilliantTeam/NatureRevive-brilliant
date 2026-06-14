@@ -4,6 +4,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationManager;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
+import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,6 +20,7 @@ public class ReloadCommand implements SubCommand {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
             NatureRevivePlugin.readonlyConfig.reloadConfig();
+            NatureRevivePlugin.languageManager.load();
             NatureRevivePlugin.integrationManager = new IntegrationManager();
             NatureRevivePlugin.integrationManager.clearDependency();
             NatureRevivePlugin.checkSoftDependPlugins();
@@ -28,12 +30,12 @@ public class ReloadCommand implements SubCommand {
             NatureRevivePlugin.taskManager.init();
 
             sender.sendMessage(ChatColor.translateAlternateColorCodes(
-                    '&', NatureRevivePlugin.readonlyConfig.reloadSuccessMessage
+                    '&', Lang.get("messages.reload-success")
             ));
         } catch (Exception e) {
             sender.sendMessage(
                     ChatColor.translateAlternateColorCodes(
-                    '&', NatureRevivePlugin.readonlyConfig.reloadFailureMessage
+                    '&', Lang.get("messages.reload-failure")
                     )
             );
 

@@ -21,7 +21,7 @@ public class ReadonlyConfig {
 
     private YamlFile configuration;
 
-    public final int CONFIG_VERSION = 18;
+    public final int CONFIG_VERSION = 19;
 
     public boolean debug;
 
@@ -75,15 +75,7 @@ public class ReadonlyConfig {
 
     public String coreProtectUserName;
 
-    public String reloadSuccessMessage;
-
-    public String reloadFailureMessage;
-
-    public String stopChunkRegenerationMessage;
-
-    public String startChunkRegenerationMessage;
-
-    public String forceRegenFailedDueRegenStopMessage;
+    public String language;
 
     public String regenerationStrategy;
 
@@ -186,25 +178,12 @@ public class ReadonlyConfig {
                     "The username to use in CoreProtect logging.",
                     "Demo: https://media.discordapp.net/attachments/934304177134370847/1018496146441764954/AddText_09-11-08.12.27.png")));
 
-            configuration.set("messages.reload-success-message", "&a成功重載插件配置檔!");
-            configuration.setComment("messages.reload-success-message", convertListStringToString(Arrays.asList("當插件配置檔重載成功時，向指令執行者傳送的訊息",
-                    "The message to be sent on plugin's configuration is reloaded successfully.")));
-
-            configuration.set("messages.reload-failure-message", "&c插件配置檔重載失敗, 請查看後台以獲取詳細記錄.");
-            configuration.setComment("messages.reload-failure-message", convertListStringToString(Arrays.asList("當插件配置檔重載失敗時，向指令執行者傳送的訊息.",
-                    "The message to be sent on plugin's configuration is failed to reload.")));
-
-            configuration.set("messages.stop-regeneration", "&e關閉區塊重生系統成功, 倘若想要再次開啟, 請執行 /naturerevive resume");
-            configuration.setComment("messages.stop-regeneration", convertListStringToString(Arrays.asList("當區塊重生系統被關閉時，向指令執行者傳送的訊息.",
-                    "The message to be sent on plugin's chunk regeneration system was turned off.")));
-
-            configuration.set("messages.start-regeneration", "&a開啟區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive pause");
-            configuration.setComment("messages.start-regeneration", convertListStringToString(Arrays.asList("當區塊重生系統被重新開啟時，向指令執行者傳送的訊息.",
-                    "The message to be sent on plugin's chunk regeneration system was turned on again.")));
-
-            configuration.set("messages.force-regen-fail-due-to-regeneration-stop", "&c無法在區塊重生系統關閉時強制重生區塊!");
-            configuration.setComment("messages.force-regen-fail-due-to-regeneration-stop", convertListStringToString(Arrays.asList("當區塊重生系統被關閉時, 執行強制重生系統會回傳的訊息.",
-                    "The message to be sent on forcing regenerate command was invoked but the regeneration system was paused.")));
+            configuration.set("language", "en_US");
+            configuration.setComment("language", convertListStringToString(Arrays.asList(
+                    "插件語言，對應 plugins/NatureRevive/lang/ 資料夾內的檔案名稱（如 zh_TW, en_US）。",
+                    "所有可顯示的訊息皆定義於該語言檔內，您可自由編輯或新增語言檔。",
+                    "The plugin language, corresponding to the file name in the plugins/NatureRevive/lang/ folder (e.g. zh_TW, en_US).",
+                    "All displayable messages are defined in that language file; you may freely edit it or add new language files.")));
 
             configuration.set("config-version", CONFIG_VERSION);
             configuration.setComment("config-version", convertListStringToString(Arrays.asList("配置檔案版本，請不要更改此數值！", "Config version, DO NOT CHANGE IT MANUALLY AS IT MIGHT OVERWRITE ENTIRE CONFIGURATION.")));
@@ -686,6 +665,14 @@ public class ReadonlyConfig {
                 )));
 
                 configuration.set("coreprotect-logging-enable", false);
+            case 18:
+                configuration.set("messages", null);
+                configuration.set("language", "en_US");
+                configuration.setComment("language", convertListStringToString(Arrays.asList(
+                        "插件語言，對應 plugins/NatureRevive/lang/ 資料夾內的檔案名稱（如 zh_TW, en_US）。",
+                        "所有可顯示的訊息皆定義於該語言檔內，您可自由編輯或新增語言檔。",
+                        "The plugin language, corresponding to the file name in the plugins/NatureRevive/lang/ folder (e.g. zh_TW, en_US).",
+                        "All displayable messages are defined in that language file; you may freely edit it or add new language files.")));
             default:
                 configuration.set("config-version", CONFIG_VERSION);
                 try {
@@ -730,11 +717,7 @@ public class ReadonlyConfig {
         regenOffsetDuration = parseDuration(configuration.getString("regen-offset-max-duration", "0d"));
         elytraExceedLimitOffsetDuration = parseDuration(configuration.getString("elytra-exceed-limit-offset-duration", "1d")); // todo: Structure part
         coreProtectUserName = configuration.getString("coreprotect-log-username", "#資源再生"); // coreprotect-username
-        reloadSuccessMessage = configuration.getString("messages.reload-success-message", "&a成功重載插件配置檔!"); // same
-        reloadFailureMessage = configuration.getString("messages.reload-failure-message", "&c插件配置檔重載失敗, 請查看後台以獲取詳細記錄."); // same
-        stopChunkRegenerationMessage = configuration.getString("messages.stop-regeneration", "&e關閉區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive resume"); // same
-        startChunkRegenerationMessage = configuration.getString("messages.start-regeneration", "&a開啟區塊重生系統成功, 倘若想要再次關閉, 請執行 /naturerevive pause"); // same
-        forceRegenFailedDueRegenStopMessage = configuration.getString("messages.force-regen-fail-due-to-regeneration-stop", "&c無法在區塊重生系統關閉時強制重生區塊!"); // same
+        language = configuration.getString("language", "zh_TW");
 
         ignoredWorld = configuration.getStringList("blacklist-worlds"); // new options: world-list
         allowedWorld = configuration.getStringList("whitelist-worlds"); // new options: world-list

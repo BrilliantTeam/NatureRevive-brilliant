@@ -1,0 +1,58 @@
+# NatureRevive language file (English)
+#
+# This file is used when the "language" option in config.yml is set to en_US.
+#
+# Use & for colour codes (e.g. &a, &c). %s / %d are placeholders, do not remove them.
+
+# Player command messages
+messages:
+  reload-success: "&aPlugin configuration reloaded successfully!"
+  reload-failure: "&cFailed to reload the configuration, please check the console for details."
+  stop-regeneration: "&eChunk regeneration system disabled. To enable it again, run /naturerevive resume"
+  start-regeneration: "&aChunk regeneration system enabled. To disable it again, run /naturerevive pause"
+  force-regen-fail-due-to-regeneration-stop: "&cCannot force chunk regeneration while the regeneration system is disabled!"
+
+# Per-command messages
+command:
+  regenchunk:
+    not-player: "&cYou must be a player to run this command."
+    bukkit-unsupported-1-21: "&cServer version is 1.21+, the bukkit regeneration engine is unsupported. Please use fawe instead."
+    no-engine: "&cNo available regeneration engine found."
+  debug:
+    status-header: "NatureRevive status:\n"
+    queue-size: "- Queue size: %s"
+    chunk-regen-date: "- Regeneration date of the chunk you are standing on: %s"
+    chunk-queue-position: "- Queue position of the chunk you are standing on: %s"
+    queue-position-none: "none"
+    queue-position-nth: "#%d"
+    chunk-mark-date-unmarked: "- Mark date of the chunk you are standing on: not marked"
+  migrate:
+    usage: "[NatureRevive] &cUsage: /naturerevive migrate <yaml/sqlite/mysql>"
+    same-storage: "[NatureRevive] &cThere's no need to migrate to the same database storage type!"
+    begin: "[NatureRevive] &bBegin to migrate to %s, the old data will still be available."
+    success: "[NatureRevive] &bMigrated successfully, please restart the plugin and switch the storage method in config.yml."
+    failure: "[NatureRevive] &cFailed to migrate, please check the console and edit your config."
+
+# Console / logger messages
+console:
+  database-init-failed: "&cDatabase initialization failed!"
+  database-init-failed-mysql-hint: "&cIf you are using MySQL, please make sure the corresponding database has been created."
+  nms-load-failed: "&cFailed to load the NMS compatibility module!"
+  nms-version-unsupported: "&cYour version may not be supported by NatureRevive: %s"
+  soft-depend-missing: "Some features were enabled in your settings but NatureRevive could not load the required dependency plugin(s), so NatureRevive will stop loading."
+  no-regen-engine: "No available regeneration engine found, please make sure the regenerate-engine option is set correctly!"
+  not-paper-1: "The server software you are running does not include the patches NatureRevive requires!"
+  not-paper-2: "We recommend switching to Paper. Paper is a fork of Spigot with many optimization patches, and does not require BuildTools to obtain a build."
+  invalid-engine: "Please set regeneration-strategy to bukkit or fawe."
+  bukkit-unsupported-1-21-1: "Detected server version 1.21+, the bukkit regeneration mode is unsupported."
+  bukkit-unsupported-1-21-2: "Automatically switched the regeneration engine to FAWE, please make sure FastAsyncWorldEdit is installed."
+  fawe-not-installed-1: "FastAsyncWorldEdit is not installed on the server, NatureRevive cannot start."
+  fawe-not-installed-2: "Please install FastAsyncWorldEdit and restart the server."
+  integration-loaded: "NatureRevive successfully loaded support for the %s plugin."
+  integration-found-not-enabled: "NatureRevive found the %s plugin, but the corresponding feature is not enabled in NatureRevive."
+  integration-required-missing: "Because %s has not been loaded but is required by NatureRevive's settings, NatureRevive cannot be enabled."
+  integration-required-missing-hint: "We recommend disabling the corresponding option in the settings, or installing the corresponding plugin."
+  nms-compat-fallback-1: "Because NatureRevive does not yet natively support this Paper version: %s,"
+  nms-compat-fallback-2: "it will attempt to use the NMSHandlerCompat compatibility layer; errors or performance degradation may occur in this mode."
+  chunk-regen-error: "NatureRevive encountered a problem while regenerating chunk in world %s at (%d, %d)."
+  database-save-debug: "DatabaseSaveTask processed %d queued command(s) (collapsed into %d chunk(s)) written to the database."
