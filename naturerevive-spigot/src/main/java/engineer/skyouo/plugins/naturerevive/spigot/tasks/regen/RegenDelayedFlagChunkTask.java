@@ -4,6 +4,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ChunkRelatedEventListener;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.Task;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
+import engineer.skyouo.plugins.naturerevive.spigot.webhook.FlaggedLocation;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,11 +17,15 @@ public class RegenDelayedFlagChunkTask implements Task {
         NatureRevivePlugin plugin = JavaPlugin.getPlugin(NatureRevivePlugin.class);
 
         for (int i = 0; i < readonlyConfig.blockProcessingAmountPerProcessing && blockQueue.hasNext(); i++) {
-            Location location = blockQueue.pop();
+            FlaggedLocation flagged = blockQueue.pop();
+
+            if (flagged == null) continue;
+
+            Location location = flagged.getLocation();
 
             if (location != null && location.getWorld() != null) {
                 ScheduleUtil.REGION.runTask(plugin, location, () -> {
-                    ChunkRelatedEventListener.flagChunk(location);
+                    ChunkRelatedEventListener.flagChunk(location, flagged.getReason());
                 });
             }
         }

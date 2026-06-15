@@ -6,6 +6,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.tasks.block.BlockLoggingTask;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.block.BlockPutTask;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.data.DatabaseSaveTask;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.data.ElytraResetTask;
+import engineer.skyouo.plugins.naturerevive.spigot.tasks.data.WebhookFlushTask;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.regen.RegenDelayedFlagChunkTask;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.regen.RegenQueueCheckTask;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.regen.RegenTask;
@@ -68,6 +69,7 @@ public class TaskManager {
 
     private List<Task> getDefaultTasks() {
         return List.of(new RegenDelayedFlagChunkTask(), new RegenQueueCheckTask(), new RegenTask(),
-                new DatabaseSaveTask(), new ElytraResetTask(), new BlockLoggingTask(), new BlockPutTask());
+                new DatabaseSaveTask(), new ElytraResetTask(), new BlockLoggingTask(), new BlockPutTask(),
+                new WebhookFlushTask());
     }
 }

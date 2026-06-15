@@ -54,3 +54,29 @@ console:
   nms-compat-fallback-2: "將嘗試使用兼容層 NMSHandlerCompat，該模式下，有可能出現錯誤或性能下降。"
   chunk-regen-error: "NatureRevive 在重生世界 %s 區塊（%d，%d）時遇到了問題。"
   database-save-debug: "DatabaseSaveTask 已處理 %d 筆佇列指令（收斂為 %d 個區塊）寫入資料庫。"
+  webhook-send-failed: "Webhook 訊息傳送失敗：%s"
+  webhook-rate-limited: "Webhook 請求遭到速率限制（HTTP 429），部分通知可能延遲送達。"
+
+# Webhook 通知訊息
+webhook:
+  # 當批次超過 Discord 字數上限、改以 .txt 檔案附件傳送時所使用的訊息內文。
+  attachment-notice: "📄 共 %d 筆通知超過 Discord 字數上限，已改以檔案附件傳送。"
+  # %world% 佔位符的自訂顯示名稱。
+  # 可逐一世界設定或編輯；未在此設定的世界則顯示其原始名稱。
+  world:
+    world: "主世界"
+    world_nether: "地獄"
+    world_the_end: "終界"
+  # 區塊被記錄／更新的原因顯示名稱（對應 %reason% 佔位符）。
+  reason:
+    block-break: "方塊破壞"
+    block-place: "方塊放置"
+    block-explode: "方塊爆炸"
+    entity-explode: "實體爆炸"
+    entity-death: "實體死亡"
+    brew: "釀造"
+    furnace-burn: "熔爐燃燒"
+    block-grow: "方塊生長"
+    block-redstone: "紅石活動"
+    player-interact: "玩家互動"
+    manual: "手動／指令"

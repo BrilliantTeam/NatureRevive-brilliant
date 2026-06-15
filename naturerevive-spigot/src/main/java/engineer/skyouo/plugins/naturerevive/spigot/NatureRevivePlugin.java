@@ -22,6 +22,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import engineer.skyouo.plugins.naturerevive.spigot.lang.LanguageManager;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ChunkRelatedEventListener;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ObfuscateLootListener;
+import engineer.skyouo.plugins.naturerevive.spigot.listeners.WebhookRegenListener;
 import engineer.skyouo.plugins.naturerevive.spigot.stats.Metrics;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BlockDataChangeWithPos;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BlockStateWithPos;
@@ -29,6 +30,8 @@ import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.SQLCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.TaskManager;
 import engineer.skyouo.plugins.naturerevive.spigot.util.Util;
+import engineer.skyouo.plugins.naturerevive.spigot.webhook.FlaggedLocation;
+import engineer.skyouo.plugins.naturerevive.spigot.webhook.WebhookConfig;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -59,13 +62,14 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
     public static INMSWrapper nmsWrapper;
     public static ReadonlyConfig readonlyConfig;
     public static LanguageManager languageManager;
+    public static WebhookConfig webhookConfig;
     public static DatabaseConfig databaseConfig;
 
     public static SuspendedZone suspendedZone;
 
     public static Queue<BukkitPositionInfo> queue = null;
     public static final Set<String> regenInFlight = ConcurrentHashMap.newKeySet();
-    public static Queue<Location> blockQueue = new Queue<>();
+    public static Queue<FlaggedLocation> blockQueue = new Queue<>();
     public static final Queue<BlockStateWithPos> blockStateWithPosQueue = new Queue<>();
     public static final Queue<BlockDataChangeWithPos> blockDataChangeWithPos = new Queue<>();
     public static final Queue<SQLCommand> sqlCommandQueue = new Queue<>();
@@ -82,6 +86,8 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
         }
 
         languageManager = new LanguageManager(this);
+
+        webhookConfig = new WebhookConfig(this);
 
         try {
             databaseConfig = readonlyConfig.determineDatabase();
@@ -164,6 +170,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
 
         getServer().getPluginManager().registerEvents(new ChunkRelatedEventListener(), this);
         getServer().getPluginManager().registerEvents(new ObfuscateLootListener(), this);
+        getServer().getPluginManager().registerEvents(new WebhookRegenListener(), this);
 
         // todo: move this to another class
 

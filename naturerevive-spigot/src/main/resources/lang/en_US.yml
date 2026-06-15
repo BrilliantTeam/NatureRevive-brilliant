@@ -56,3 +56,29 @@ console:
   nms-compat-fallback-2: "it will attempt to use the NMSHandlerCompat compatibility layer; errors or performance degradation may occur in this mode."
   chunk-regen-error: "NatureRevive encountered a problem while regenerating chunk in world %s at (%d, %d)."
   database-save-debug: "DatabaseSaveTask processed %d queued command(s) (collapsed into %d chunk(s)) written to the database."
+  webhook-send-failed: "Failed to send webhook message: %s"
+  webhook-rate-limited: "Webhook request was rate limited (HTTP 429); some notifications may be delayed."
+
+# Webhook notification messages
+webhook:
+  # Message content used when a batch exceeds Discord's character limit and is sent as a .txt attachment.
+  attachment-notice: "📄 %d entr(y/ies) exceeded Discord's character limit and were attached as a file."
+  # Display-name overrides for the %world% placeholder.
+  # Add or edit one entry per world. A world without an entry here uses its raw name.
+  world:
+    world: "Overworld"
+    world_nether: "The Nether"
+    world_the_end: "The End"
+  # Display names for the reason a chunk was recorded / updated (the %reason% placeholder).
+  reason:
+    block-break: "Block broken"
+    block-place: "Block placed"
+    block-explode: "Block explosion"
+    entity-explode: "Entity explosion"
+    entity-death: "Entity death"
+    brew: "Brewing"
+    furnace-burn: "Furnace burning"
+    block-grow: "Block growth"
+    block-redstone: "Redstone activity"
+    player-interact: "Player interaction"
+    manual: "Manual / command"

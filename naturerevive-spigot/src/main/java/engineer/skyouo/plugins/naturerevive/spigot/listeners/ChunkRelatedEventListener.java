@@ -7,6 +7,9 @@ import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ILandPluginIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
+import engineer.skyouo.plugins.naturerevive.spigot.webhook.FlagReason;
+import engineer.skyouo.plugins.naturerevive.spigot.webhook.FlaggedLocation;
+import engineer.skyouo.plugins.naturerevive.spigot.webhook.WebhookManager;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -40,7 +43,7 @@ public class ChunkRelatedEventListener implements Listener {
         if (event.isCancelled())
             return;
 
-        NatureRevivePlugin.blockQueue.add(event.getBlock().getLocation());
+        NatureRevivePlugin.blockQueue.add(new FlaggedLocation(event.getBlock().getLocation(), FlagReason.BLOCK_BREAK));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -48,7 +51,7 @@ public class ChunkRelatedEventListener implements Listener {
         if (event.isCancelled())
             return;
 
-        NatureRevivePlugin.blockQueue.add(event.getBlock().getLocation());
+        NatureRevivePlugin.blockQueue.add(new FlaggedLocation(event.getBlock().getLocation(), FlagReason.BLOCK_PLACE));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -68,7 +71,7 @@ public class ChunkRelatedEventListener implements Listener {
                         thisPoint.getBlockX() + 16 * i,
                         thisPoint.getBlockY(),
                         thisPoint.getBlockZ() + 16 * j);
-                flagChunk(newLocation);
+                flagChunk(newLocation, FlagReason.PLAYER_INTERACT);
                 log(event, newLocation);
             }
         }
@@ -85,7 +88,7 @@ public class ChunkRelatedEventListener implements Listener {
                         thisPoint.getBlockX() + 16 * i,
                         thisPoint.getBlockY(),
                         thisPoint.getBlockZ() + 16 * j);
-                flagChunk(newLocation);
+                flagChunk(newLocation, FlagReason.BLOCK_GROW);
                 log(event, newLocation);
             }
         }
@@ -102,7 +105,7 @@ public class ChunkRelatedEventListener implements Listener {
                         thisPoint.getBlockX() + 16 * i,
                         thisPoint.getBlockY(),
                         thisPoint.getBlockZ() + 16 * j);
-                flagChunk(newLocation);
+                flagChunk(newLocation, FlagReason.BLOCK_REDSTONE);
                 log(event, newLocation);
             }
         }
@@ -135,7 +138,7 @@ public class ChunkRelatedEventListener implements Listener {
         if (event.getEntity().getKiller() == null)
             return;
 
-        NatureRevivePlugin.blockQueue.add(event.getEntity().getLocation());
+        NatureRevivePlugin.blockQueue.add(new FlaggedLocation(event.getEntity().getLocation(), FlagReason.ENTITY_DEATH));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -150,7 +153,7 @@ public class ChunkRelatedEventListener implements Listener {
             log(event, block.getLocation());
              */
 
-            NatureRevivePlugin.blockQueue.add(block.getLocation());
+            NatureRevivePlugin.blockQueue.add(new FlaggedLocation(block.getLocation(), FlagReason.BLOCK_EXPLODE));
         }
     }
 
@@ -165,19 +168,19 @@ public class ChunkRelatedEventListener implements Listener {
             flagChunk(block.getLocation());
              */
 
-            NatureRevivePlugin.blockQueue.add(block.getLocation());
+            NatureRevivePlugin.blockQueue.add(new FlaggedLocation(block.getLocation(), FlagReason.ENTITY_EXPLODE));
         }
     }
 
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBrewEvent(BrewEvent event) {
-        NatureRevivePlugin.blockQueue.add(event.getBlock().getLocation());
+        NatureRevivePlugin.blockQueue.add(new FlaggedLocation(event.getBlock().getLocation(), FlagReason.BREW));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onFurnaceBurnEvent(FurnaceBurnEvent event) {
-        NatureRevivePlugin.blockQueue.add(event.getBlock().getLocation());
+        NatureRevivePlugin.blockQueue.add(new FlaggedLocation(event.getBlock().getLocation(), FlagReason.FURNACE_BURN));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -196,6 +199,10 @@ public class ChunkRelatedEventListener implements Listener {
     }
 
     public static void flagChunk(Location location) {
+        flagChunk(location, FlagReason.MANUAL);
+    }
+
+    public static void flagChunk(Location location, FlagReason reason) {
         if (location == null || location.getWorld() == null)
             return;
 
@@ -229,6 +236,9 @@ public class ChunkRelatedEventListener implements Listener {
                 0L;
 
         BukkitPositionInfo positionInfo = new BukkitPositionInfo(location, System.currentTimeMillis() + NatureRevivePlugin.readonlyConfig.ttlDuration + offset);
+
+        boolean isNew = NatureRevivePlugin.databaseConfig.get(positionInfo) == null;
+        WebhookManager.notifyFlag(positionInfo, reason, isNew);
 
         NatureRevivePlugin.databaseConfig.set(positionInfo);
     }

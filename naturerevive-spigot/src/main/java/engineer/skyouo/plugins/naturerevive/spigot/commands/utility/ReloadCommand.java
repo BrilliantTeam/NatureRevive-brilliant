@@ -21,6 +21,7 @@ public class ReloadCommand implements SubCommand {
         try {
             NatureRevivePlugin.readonlyConfig.reloadConfig();
             NatureRevivePlugin.languageManager.load();
+            NatureRevivePlugin.webhookConfig.load();
             NatureRevivePlugin.integrationManager = new IntegrationManager();
             NatureRevivePlugin.integrationManager.clearDependency();
             NatureRevivePlugin.checkSoftDependPlugins();

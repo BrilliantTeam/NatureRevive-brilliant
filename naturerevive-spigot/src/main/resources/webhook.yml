@@ -1,0 +1,103 @@
+# 可用佔位符
+# Available placeholders:
+
+#   %world%        - 世界名稱（可於語言檔以 webhook.world.<世界名> 覆寫顯示名稱）
+#   %world%        - world name (overridable via the webhook.world.<name> language key)
+
+#   %chunk_x%      - 區塊 X 座標
+#   %chunk_x%      - chunk X
+
+#   %chunk_z%      - 區塊 Z 座標
+#   %chunk_z%      - chunk Z
+
+#   %block_x%      - 區塊起始方塊 X 座標（一般座標）
+#   %block_x%      - chunk's starting block X (normal coordinate)
+
+#   %block_z%      - 區塊起始方塊 Z 座標（一般座標）
+#   %block_z%      - chunk's starting block Z (normal coordinate)
+
+#   %block_x_end%  - 區塊結束方塊 X 座標
+#   %block_x_end%  - chunk's ending block X
+
+#   %block_z_end%  - 區塊結束方塊 Z 座標
+#   %block_z_end%  - chunk's ending block Z
+
+#   %reason%       - 觸發原因（事件類型）
+#   %reason%       - trigger reason (event type)
+
+#   %regen_time%   - 預計再生時間（僅 record / update）
+#   %regen_time%   - estimated regeneration time (record / update only)
+
+#   %time%         - 時間
+#   %time%         - timestamp
+
+#   %count%        - 本則訊息彙整的筆數
+#   %count%        - number of entries batched into this message
+
+# 是否啟用 webhook。預設關閉。
+# Master switch. Disabled by default.
+enabled: false
+
+# Discord Webhook URL（或任何接受相同 JSON 格式的端點）。
+# Discord webhook URL (or any endpoint that accepts the same JSON payload).
+url: ""
+
+# 可選：覆寫顯示名稱與頭像。留空則使用 webhook 預設。
+# Optional: override the displayed name / avatar. Leave blank to use the webhook defaults.
+username: "NatureRevive"
+avatar-url: ""
+
+batch:
+  # 單則訊息最多彙整幾筆事件。使用 embed 時 Discord 上限為 10。
+  # Max entries merged into one message. Discord caps embeds at 10 per message.
+  max-per-message: 10
+
+events:
+  # 區塊首次被記錄
+  # A chunk is recorded for the first time
+  record:
+    enabled: true
+    # true 使用 embed；false 改用下方 content 純文字。
+    # true = embed; false = plain "content" text below.
+    use-embed: false
+    content: "- 🌱 ` %world% ` X: ` %block_x% ~ %block_x_end% ` Z: ` %block_z% ~ %block_z_end% ` recorded\n> Reason: ` %reason% `\n> Regenerates at: ` %regen_time% `"
+    embed:
+      title: "🌱 Chunk recorded"
+      color: "#F6E0A4"
+      description: "Reason: **%reason%**"
+      fields:
+        - { name: "World", value: "` %world% `", inline: true }
+        - { name: "Coordinates", value: "X ` %block_x% ~ %block_x_end% ` Z ` %block_z% ~ %block_z_end% `", inline: true }
+        - { name: "Regenerates at", value: "` %regen_time% `", inline: false }
+      footer: "%time%"
+
+  # 已記錄的區塊被再次標記（TTL 重置）
+  # An already-recorded chunk is re-flagged (TTL reset)
+  update:
+    enabled: true
+    use-embed: false
+    content: "- ♻️ ` %world% ` X: ` %block_x% ~ %block_x_end% ` Z: ` %block_z% ~ %block_z_end% ` updated\n> Reason: ` %reason% `\n> Regenerates at: ` %regen_time% `"
+    embed:
+      title: "♻️ Chunk record updated"
+      color: "#7AD3FF"
+      description: "Reason: **%reason%**"
+      fields:
+        - { name: "World", value: "` %world% `", inline: true }
+        - { name: "Coordinates", value: "X ` %block_x% ~ %block_x_end% ` Z ` %block_z% ~ %block_z_end% `", inline: true }
+        - { name: "Regenerates at", value: "` %regen_time% `", inline: false }
+      footer: "%time%"
+
+  # 區塊完成再生
+  # A chunk finished regenerating
+  regenerate:
+    enabled: true
+    use-embed: false
+    content: "- 🌳 ` %world% ` X: ` %block_x% ~ %block_x_end% ` Z: ` %block_z% ~ %block_z_end% ` regenerated"
+    embed:
+      title: "🌳 Chunk regenerated"
+      color: "#CFFFC0"
+      description: ""
+      fields:
+        - { name: "World", value: "` %world% `", inline: true }
+        - { name: "Coordinates", value: "X ` %block_x% ~ %block_x_end% ` Z ` %block_z% ~ %block_z_end% `", inline: true }
+      footer: "%time%"
