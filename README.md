@@ -1,5 +1,5 @@
 # NatureRevive - brilliant | Resource Regeneration, Say Goodbye to the Resource World!
-## Game Version: 1.17 - 26.1.2    
+## Game Version: 1.17 - 26.2    
 - Chinese  Introduction: [https://forum.gamer.com.tw/C.php?bsn=18673&snA=205249](https://forum.gamer.com.tw/C.php?bsn=18673&snA=205249)    
 - Spigot: https://www.spigotmc.org/resources/naturerevive-brilliant.136155    
 - Hangar: https://hangar.papermc.io/RICE0707/NatureRevive-Brilliant    
