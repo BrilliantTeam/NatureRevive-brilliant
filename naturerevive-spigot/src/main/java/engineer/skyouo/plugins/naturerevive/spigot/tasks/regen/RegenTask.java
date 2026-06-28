@@ -16,6 +16,8 @@ import java.util.List;
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
 
 public class RegenTask implements Task {
+    private String lastSkipReason = "";
+
     @Override
     public void run() {
         if (!isSuitableForChunkRegeneration()) {
@@ -43,7 +45,9 @@ public class RegenTask implements Task {
                         );
 
                 if (hasLandProtection) {
+                    databaseConfig.unset(task);
                     regenInFlight.remove(task.getChunkKey());
+                    NatureReviveComponentLogger.debug("Skipped (land) and removed from DB: %s", TextColor.fromHexString("#AAAAAA"), task);
                     return;
                 }
                 task.regenerateChunk();
@@ -69,8 +73,31 @@ public class RegenTask implements Task {
     }
 
     private boolean isSuitableForChunkRegeneration() {
-        return Bukkit.getServer().getOnlinePlayers().size() < readonlyConfig.maxPlayersCountForRegeneration && (Util.isFolia() ?
-                Bukkit.getTPS()[0] : nmsWrapper.getRecentTps()[0]) > readonlyConfig.minTPSCountForRegeneration &&
-                enableRevive && readonlyConfig.isCurrentTimeAllowForRSC();
+        int players = Bukkit.getServer().getOnlinePlayers().size();
+        double tps = Util.isFolia() ? Bukkit.getTPS()[0] : nmsWrapper.getRecentTps()[0];
+        boolean timeOk = readonlyConfig.isCurrentTimeAllowForRSC();
+
+        String reason = null;
+        if (players >= readonlyConfig.maxPlayersCountForRegeneration)
+            reason = "players " + players + " >= max " + readonlyConfig.maxPlayersCountForRegeneration;
+        else if (tps <= readonlyConfig.minTPSCountForRegeneration)
+            reason = String.format("TPS %.2f <= min %.2f", tps, readonlyConfig.minTPSCountForRegeneration);
+        else if (!enableRevive)
+            reason = "enableRevive=false (paused)";
+        else if (!timeOk)
+            reason = "outside spawn-timer (" + readonlyConfig.spawnTimer + ")";
+
+        if (reason != null) {
+            if (!reason.equals(lastSkipReason)) {
+                NatureReviveComponentLogger.debug("Regen skipped: %s", reason);
+                lastSkipReason = reason;
+            }
+            return false;
+        }
+        if (!lastSkipReason.isEmpty()) {
+            NatureReviveComponentLogger.debug("Regen resumed");
+            lastSkipReason = "";
+        }
+        return true;
     }
 }
