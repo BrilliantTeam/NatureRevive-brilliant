@@ -263,9 +263,10 @@ public class ReadonlyConfig {
             configuration.set("spawn-timer", "00:00-23:59");
             configuration.setComment("spawn-timer", convertListStringToString(Arrays.asList(
                     "限定進行重生區塊的時間, 區塊重生僅會在指定時間內進行生成(通常設定為半夜).",
-                    "格式為24小時制，0不可省略 (xx:xx-xx:xx), 預設為凌晨0:00至上午7:00",
-                    "Limit the time of chunk regenerate (mostly at midnight) to prevent player",
-                    "experiencing from major performance degraded."
+                    "格式為 24 小時制，0 不可省略。支援 HH:mm-HH:mm 或精確秒數 HH:mm:ss-HH:mm:ss。",
+                    "設定為 -1 可停用時間限制，任何時間皆可重生。",
+                    "Limit the time of chunk regeneration (usually midnight) to prevent performance spikes.",
+                    "Format: HH:mm-HH:mm or HH:mm:ss-HH:mm:ss. Set to -1 to disable the restriction."
             )));
 
             configuration.set("blacklist-worlds", Arrays.asList("世界 1", "World 2"));
@@ -592,11 +593,11 @@ public class ReadonlyConfig {
                 ));
                 configuration.set("spawn-timer", "00:00-23:59");
                 configuration.setComment("spawn-timer", convertListStringToString(Arrays.asList(
-                        "限定進行重生區塊的時間, 區塊重生僅會在指定時間內進行生成(通常設定為半夜).",
-                        "格式為24小時制，0不可省略 (xx:xx-xx:xx), 預設為凌晨0:00至上午7:00",
-                        "Limit the time of chunk regenerate (mostly at midnight) to prevent player",
-                        "experiencing from major performance degraded."
-
+                        "限定進行重生區塊的時間, 區塊重生僅會在指定時間內進行生成（通常設定為半夜）",
+                        "格式為 24 小時制，0 不可省略。支援 HH:mm-HH:mm 或精確秒數 HH:mm:ss-HH:mm:ss。",
+                        "設定為 -1 可停用時間限制，任何時間皆可重生。",
+                        "Limit the time of chunk regeneration (usually midnight) to prevent performance spikes.",
+                        "Format: HH:mm-HH:mm or HH:mm:ss-HH:mm:ss. Set to -1 to disable the restriction."
                 )));
             case 15: // major update
                 configuration.set("regeneration-engine", "bukkit");
@@ -785,14 +786,15 @@ public class ReadonlyConfig {
         return String.join(System.lineSeparator(), comments);
     }
 
-    //判定當前系統時間是否在表定範圍內
-    public boolean isCurrentTimeAllowForRSC(){
+    public boolean isCurrentTimeAllowForRSC() {
+        if ("-1".equals(spawnTimer)) return true;
         String[] timeParts = spawnTimer.split("-");
-        LocalTime timeRangeStart = LocalTime.parse(timeParts[0]); // 設定起始時間
-        LocalTime timeRangeEnd =  LocalTime.parse(timeParts[1]); // 設定結束時間
+        LocalTime timeRangeStart = LocalTime.parse(timeParts[0]);
+        LocalTime timeRangeEnd = timeParts[1].length() == 5
+                ? LocalTime.parse(timeParts[1]).withSecond(59)
+                : LocalTime.parse(timeParts[1]);
         LocalTime currentTime = LocalTime.now();
-        //判定是否可以汪...是否藉於時間內 (r: T/F)
-        return currentTime.isAfter(timeRangeStart) && currentTime.isBefore(timeRangeEnd);
+        return !currentTime.isBefore(timeRangeStart) && !currentTime.isAfter(timeRangeEnd);
     }
 }
 
