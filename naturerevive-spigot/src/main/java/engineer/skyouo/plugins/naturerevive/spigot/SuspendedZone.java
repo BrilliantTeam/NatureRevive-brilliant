@@ -1,6 +1,7 @@
 package engineer.skyouo.plugins.naturerevive.spigot;
 
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLDatabaseAdapter;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 
 import java.io.File;
@@ -41,23 +42,30 @@ public class SuspendedZone {
         if (NatureRevivePlugin.enableRevive)
             throw new RuntimeException("Cannot resume the queue since the regeneration system is not paused!");
 
-        Set<BukkitPositionInfo> positionInfoSet = new HashSet<>();
-
-        for (int i = 0; i < NatureRevivePlugin.queue.size(); i++) {
+        List<BukkitPositionInfo> drained = new ArrayList<>();
+        while (NatureRevivePlugin.queue.hasNext()) {
             BukkitPositionInfo task = NatureRevivePlugin.queue.pop();
-
-            if ((task.getTTL() - NatureRevivePlugin.readonlyConfig.ttlDuration) < frozenTimeStartMs) {
-                NatureRevivePlugin.queue.add(task);
-            } else {
-                task.setTTL(System.currentTimeMillis() + (task.getTTL() - frozenTimeStartMs));
-                positionInfoSet.add(task);
+            if (task != null) {
+                drained.add(task);
+                NatureRevivePlugin.regenInFlight.remove(task.getChunkKey());
             }
         }
 
-        if (NatureRevivePlugin.databaseConfig instanceof SQLDatabaseAdapter) {
-            ((SQLDatabaseAdapter) NatureRevivePlugin.databaseConfig).massUpdate(positionInfoSet);
+        Set<BukkitPositionInfo> toUpdate = new HashSet<>();
+
+        for (BukkitPositionInfo task : drained) {
+            if ((task.getTTL() - NatureRevivePlugin.readonlyConfig.ttlDuration) < frozenTimeStartMs) {
+                ChunkRegeneration.enqueue(task);
+            } else {
+                task.setTTL(System.currentTimeMillis() + (task.getTTL() - frozenTimeStartMs));
+                toUpdate.add(task);
+            }
+        }
+
+        if (NatureRevivePlugin.databaseConfig instanceof SQLDatabaseAdapter adapter) {
+            adapter.massUpdate(toUpdate);
         } else {
-            for (BukkitPositionInfo positionInfo : positionInfoSet)
+            for (BukkitPositionInfo positionInfo : toUpdate)
                 NatureRevivePlugin.databaseConfig.set(positionInfo);
         }
 

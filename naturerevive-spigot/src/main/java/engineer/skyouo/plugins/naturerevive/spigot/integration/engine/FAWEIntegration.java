@@ -2,6 +2,7 @@ package engineer.skyouo.plugins.naturerevive.spigot.integration.engine;
 
 import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.FaweImplRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.util.FoliaRegionContext;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
@@ -66,15 +67,24 @@ public class FAWEIntegration implements IEngineIntegration {
                     try {
                         FaweImplRegeneration.regenerate(chunk, false, () ->
                             ScheduleUtil.REGION.runTask(plugin, chunk, postTask));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        ChunkRegeneration.releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
                     } finally {
                         FoliaRegionContext.clear();
                     }
                 });
             });
         } else {
-            ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () ->
-                FaweImplRegeneration.regenerate(chunk, false, () ->
-                    ScheduleUtil.REGION.runTask(plugin, chunk, postTask)));
+            ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
+                try {
+                    FaweImplRegeneration.regenerate(chunk, false, () ->
+                        ScheduleUtil.REGION.runTask(plugin, chunk, postTask));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ChunkRegeneration.releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+                }
+            });
         }
     }
 }

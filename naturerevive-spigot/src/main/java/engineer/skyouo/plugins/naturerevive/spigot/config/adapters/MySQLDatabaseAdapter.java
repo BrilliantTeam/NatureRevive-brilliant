@@ -153,9 +153,9 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
             for (BukkitPositionInfo positionInfo : BukkitPositionInfoSet) {
                 cache.put(positionInfo.getLocation(), positionInfo);
 
-                preparedStatement.setInt(1, positionInfo.getX());
-                preparedStatement.setInt(2, positionInfo.getZ());
-                preparedStatement.setLong(3, positionInfo.getTTL());
+                preparedStatement.setLong(1, positionInfo.getTTL());
+                preparedStatement.setInt(2, positionInfo.getX());
+                preparedStatement.setInt(3, positionInfo.getZ());
                 preparedStatement.setString(4, positionInfo.getWorldName());
                 preparedStatement.addBatch();
             }

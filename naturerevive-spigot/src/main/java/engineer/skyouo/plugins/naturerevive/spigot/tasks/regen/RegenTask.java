@@ -18,42 +18,38 @@ import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
 public class RegenTask implements Task {
     @Override
     public void run() {
-        if (queue.size() > 0 && isSuitableForChunkRegeneration()) {
-            for (int i = 0; i < readonlyConfig.taskPerProcess && queue.hasNext(); i++) {
-                BukkitPositionInfo task = queue.pop();
+        if (!isSuitableForChunkRegeneration()) {
+            return;
+        }
 
-                if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getLocation().getWorld().getName())) {
-                    regenInFlight.remove(task.getChunkKey());
-                    continue;
-                }
+        for (int i = 0; i < readonlyConfig.taskPerProcess && queue.hasNext(); i++) {
+            BukkitPositionInfo task = queue.pop();
 
-                if (readonlyConfig.ignoredWorld.contains(task.getLocation().getWorld().getName())) {
-                    regenInFlight.remove(task.getChunkKey());
-                    continue;
-                }
-
-                ScheduleUtil.REGION.runTask(NatureRevivePlugin.instance, task.getLocation(), () -> {
-                    List<ILandPluginIntegration> integrations = IntegrationUtil.getLandIntegrations();
-                    boolean hasLandProtection = !integrations.isEmpty() &&
-                            integrations.stream().anyMatch(integration ->
-                                integration.checkHasLand(task.getLocation().getChunk()) && !integration.isStrictMode()
-                            );
-
-                    if (hasLandProtection) {
-                        regenInFlight.remove(task.getChunkKey());
-                        return;
-                    }
-                    task.regenerateChunk();
-
-                    NatureReviveComponentLogger.debug("%s was regenerated.", TextColor.fromHexString("#AAAAAA"), task);
-                });
+            if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getLocation().getWorld().getName())) {
+                regenInFlight.remove(task.getChunkKey());
+                continue;
             }
-        } else {
-            while (queue.hasNext()){
-                BukkitPositionInfo drained = queue.pop();
-                if (drained != null)
-                    regenInFlight.remove(drained.getChunkKey());
+
+            if (readonlyConfig.ignoredWorld.contains(task.getLocation().getWorld().getName())) {
+                regenInFlight.remove(task.getChunkKey());
+                continue;
             }
+
+            ScheduleUtil.REGION.runTask(NatureRevivePlugin.instance, task.getLocation(), () -> {
+                List<ILandPluginIntegration> integrations = IntegrationUtil.getLandIntegrations();
+                boolean hasLandProtection = !integrations.isEmpty() &&
+                        integrations.stream().anyMatch(integration ->
+                            integration.checkHasLand(task.getLocation().getChunk()) && !integration.isStrictMode()
+                        );
+
+                if (hasLandProtection) {
+                    regenInFlight.remove(task.getChunkKey());
+                    return;
+                }
+                task.regenerateChunk();
+
+                NatureReviveComponentLogger.debug("%s was regenerated.", TextColor.fromHexString("#AAAAAA"), task);
+            });
         }
     }
 

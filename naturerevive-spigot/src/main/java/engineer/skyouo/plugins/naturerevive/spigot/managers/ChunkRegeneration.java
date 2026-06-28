@@ -49,7 +49,7 @@ public class ChunkRegeneration {
         regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
     }
 
-    private static void releaseInFlight(String worldName, int chunkX, int chunkZ) {
+    public static void releaseInFlight(String worldName, int chunkX, int chunkZ) {
         regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
     }
 
