@@ -260,7 +260,7 @@ public class ReadonlyConfig {
                     "重生區塊的最高玩家上限, 倘若玩家數高於該數值, 區塊重生將會被擱置.",
                     "The maximum players count for regenerating expired chunks, if server's players count is greater than this value, the regeneration task will be stopped."
             )));
-            configuration.set("spawn-timer", "00:00-23:59");
+            configuration.set("spawn-timer", "00:00:00-23:59:59");
             configuration.setComment("spawn-timer", convertListStringToString(Arrays.asList(
                     "限定進行重生區塊的時間, 區塊重生僅會在指定時間內進行生成(通常設定為半夜).",
                     "格式為 24 小時制，0 不可省略。支援 HH:mm-HH:mm 或精確秒數 HH:mm:ss-HH:mm:ss。",
@@ -591,7 +591,7 @@ public class ReadonlyConfig {
                         "How many nearby chunks' expiration times should be updates once any chunk is active.")
 
                 ));
-                configuration.set("spawn-timer", "00:00-23:59");
+                configuration.set("spawn-timer", "00:00:00-23:59:59");
                 configuration.setComment("spawn-timer", convertListStringToString(Arrays.asList(
                         "限定進行重生區塊的時間, 區塊重生僅會在指定時間內進行生成（通常設定為半夜）",
                         "格式為 24 小時制，0 不可省略。支援 HH:mm-HH:mm 或精確秒數 HH:mm:ss-HH:mm:ss。",
@@ -731,7 +731,7 @@ public class ReadonlyConfig {
         databaseUsername = configuration.getString("storage.database-username", "root"); // same
         databasePassword = configuration.getString("storage.database-password", "20480727"); // same
         jdbcConnectionString = configuration.getString("storage.jdbc-connection-string", "jdbc:mysql://{database_ip}:{database_port}/{database_name}"); // same
-        spawnTimer = configuration.getString("spawn-timer","00:00-23:59"); // regenerate-at
+        spawnTimer = configuration.getString("spawn-timer","00:00:00-23:59:59"); // regenerate-at
 
         sqlProcessingCount = configuration.getInt("sql-processing-count", 500); // sql-process-batch-size
         if (NatureRevivePlugin.databaseConfig != null) {
