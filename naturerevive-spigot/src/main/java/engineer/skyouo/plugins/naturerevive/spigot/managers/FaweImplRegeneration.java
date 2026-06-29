@@ -12,33 +12,38 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.nmsWrapper;
 
 public class FaweImplRegeneration {
-    public static void regenerate(Chunk chunk, boolean regenBiomes, @Nullable Runnable afterTask) {
-        long o = System.currentTimeMillis();
-        BukkitWorld bukkitWorld = new BukkitWorld(chunk.getWorld());
 
-        int minY = nmsWrapper.getWorldMinHeight(chunk.getWorld());
-        int maxY = chunk.getWorld().getMaxHeight();
-        BlockVector3 one = BlockVector3.at(chunk.getX() << 4, minY, chunk.getZ() << 4);
-        BlockVector3 two = BlockVector3.at((chunk.getX() << 4) + 15, maxY, (chunk.getZ() << 4) + 15);
+    public static void regenerate(World world, int chunkX, int chunkZ, boolean regenBiomes, @Nullable Runnable afterTask) {
+        long o = System.currentTimeMillis();
+        BukkitWorld bukkitWorld = new BukkitWorld(world);
+
+        int minY = nmsWrapper.getWorldMinHeight(world);
+        int maxY = world.getMaxHeight();
+        BlockVector3 one = BlockVector3.at(chunkX << 4, minY, chunkZ << 4);
+        BlockVector3 two = BlockVector3.at((chunkX << 4) + 15, maxY, (chunkZ << 4) + 15);
 
         NatureReviveComponentLogger.debug("Regenerating From (%d, %d, %d) to (%d, %d, %d) in %s",
                 TextColor.fromHexString("#AAAAAA"),
-                chunk.getX() << 4, minY, chunk.getZ() << 4,
-                (chunk.getX() << 4) + 15, maxY, (chunk.getZ() << 4) + 15, bukkitWorld.getName());
+                chunkX << 4, minY, chunkZ << 4,
+                (chunkX << 4) + 15, maxY, (chunkZ << 4) + 15, bukkitWorld.getName());
 
         Region region = new CuboidRegion(bukkitWorld, one, two);
         RegenOptions options = RegenOptions.builder()
-                .seed(chunk.getWorld().getSeed())
+                .seed(world.getSeed())
                 .regenBiomes(regenBiomes)
                 .build();
 
-        try (EditSession session = WorldEdit.getInstance().newEditSession(bukkitWorld)) {
+        try (EditSession session = WorldEdit.getInstance().newEditSessionBuilder()
+                .world(bukkitWorld)
+                .changeSetNull()
+                .build()) {
             Mask mask = session.getMask();
             try {
                 session.setMask(null);
@@ -53,7 +58,9 @@ public class FaweImplRegeneration {
         NatureReviveComponentLogger.debug("Regen time cost %d ms", TextColor.fromHexString("#AAAAAA"),
                 System.currentTimeMillis() - o);
 
-        if (afterTask != null)
-            ScheduleUtil.REGION.runTask(NatureRevivePlugin.instance, chunk, afterTask);
+        if (afterTask != null) {
+            Location loc = new Location(world, chunkX << 4, 0, chunkZ << 4);
+            ScheduleUtil.REGION.runTask(NatureRevivePlugin.instance, loc, afterTask);
+        }
     }
 }

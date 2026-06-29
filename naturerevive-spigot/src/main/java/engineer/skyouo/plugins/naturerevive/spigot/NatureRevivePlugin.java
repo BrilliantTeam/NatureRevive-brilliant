@@ -205,7 +205,15 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
 
     @Override
     public void onDisable() {
+        if (taskManager != null) {
+            taskManager.unregisterTasks();
+        }
 
+        if (blockQueue != null)            blockQueue.clear();
+        if (blockStateWithPosQueue != null) blockStateWithPosQueue.clear();
+        if (blockDataChangeWithPos != null) blockDataChangeWithPos.clear();
+        if (sqlCommandQueue != null)        sqlCommandQueue.clear();
+        regenInFlight.clear();
     }
 
     private boolean registerCommand(String commandName, CommandExecutor executor) {

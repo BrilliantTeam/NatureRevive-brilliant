@@ -8,6 +8,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.util.FoliaRegionContext;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.util.Util;
 import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
@@ -62,27 +63,33 @@ public class FAWEIntegration implements IEngineIntegration {
         if (Util.isFolia()) {
             ScheduleUtil.REGION.runTask(plugin, chunk, () -> {
                 Object worldData = FoliaRegionContext.capture(chunk.getWorld());
+                World world = chunk.getWorld();
+                int chunkX = chunk.getX();
+                int chunkZ = chunk.getZ();
+
                 ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
                     FoliaRegionContext.inject(worldData);
                     try {
-                        FaweImplRegeneration.regenerate(chunk, false, () ->
-                            ScheduleUtil.REGION.runTask(plugin, chunk, postTask));
+                        FaweImplRegeneration.regenerate(world, chunkX, chunkZ, false, postTask);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        ChunkRegeneration.releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+                        ChunkRegeneration.releaseInFlightWithTickets(world, chunkX, chunkZ);
                     } finally {
                         FoliaRegionContext.clear();
                     }
                 });
             });
         } else {
+            World world = chunk.getWorld();
+            int chunkX = chunk.getX();
+            int chunkZ = chunk.getZ();
+
             ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
                 try {
-                    FaweImplRegeneration.regenerate(chunk, false, () ->
-                        ScheduleUtil.REGION.runTask(plugin, chunk, postTask));
+                    FaweImplRegeneration.regenerate(world, chunkX, chunkZ, false, postTask);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    ChunkRegeneration.releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+                    ChunkRegeneration.releaseInFlightWithTickets(world, chunkX, chunkZ);
                 }
             });
         }

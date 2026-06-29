@@ -32,6 +32,10 @@ public class Queue<T> {
 
     public void load(java.util.Queue<T> queue) { taskQueue = queue; }
 
+    public void clear() {
+        taskQueue.clear();
+    }
+
     public Queue<T> clone() {
         if (taskQueue instanceof ArrayDeque<T> aDeque) {
             return new Queue<>(aDeque.clone());

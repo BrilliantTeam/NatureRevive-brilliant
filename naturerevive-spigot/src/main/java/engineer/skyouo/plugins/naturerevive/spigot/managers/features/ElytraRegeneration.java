@@ -96,9 +96,13 @@ public class ElytraRegeneration {
                     return false;
                 } else {
                     ScheduleUtil.REGION.runTask(instance, chunk1, () -> {
-                        if (NatureRevivePlugin.readonlyConfig.regenerationEngine.equalsIgnoreCase("fawe"))
-                            FaweImplRegeneration.regenerate(chunk1, true, () -> postOtherChunkCheck(chunk1, blockFace, l));
-                        else {
+                        if (NatureRevivePlugin.readonlyConfig.regenerationEngine.equalsIgnoreCase("fawe")) {
+                            World world1 = chunk1.getWorld();
+                            int cx1 = chunk1.getX();
+                            int cz1 = chunk1.getZ();
+                            ScheduleUtil.GLOBAL.runTaskAsynchronously(instance, () ->
+                                FaweImplRegeneration.regenerate(world1, cx1, cz1, true, () -> postOtherChunkCheck(chunk1, blockFace, l)));
+                        } else {
                             chunk.getWorld().regenerateChunk(chunk1.getX(), chunk1.getZ());
                             postOtherChunkCheck(chunk1, blockFace, l);
                         }

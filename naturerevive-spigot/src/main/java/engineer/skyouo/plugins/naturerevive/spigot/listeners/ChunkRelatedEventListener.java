@@ -206,8 +206,8 @@ public class ChunkRelatedEventListener implements Listener {
             return;
         lastFlaggedAt.put(chunkKey, now);
 
-        if (lastFlaggedAt.size() > 10000)
-            lastFlaggedAt.entrySet().removeIf(entry -> now - entry.getValue() > FLAG_THROTTLE_MS);
+        if (lastFlaggedAt.size() > 1000)
+            lastFlaggedAt.entrySet().removeIf(entry -> now - entry.getValue() > FLAG_THROTTLE_MS * 2);
 
         if (!NatureRevivePlugin.readonlyConfig.allowedWorld.isEmpty() &&
                 !NatureRevivePlugin.readonlyConfig.allowedWorld.contains(location.getWorld().getName()))

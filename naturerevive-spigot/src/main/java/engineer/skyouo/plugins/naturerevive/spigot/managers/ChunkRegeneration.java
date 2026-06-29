@@ -24,11 +24,15 @@ import org.bukkit.block.data.BlockData;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
 
 public class ChunkRegeneration {
     private static int radius = 8;
+
+    private static final int MAX_LOGGING_QUEUE  = 50_000;
+    private static final int MAX_BLOCK_PUT_QUEUE = 10_000;
 
     public static boolean enqueue(BukkitPositionInfo bukkitPositionInfo) {
         if (!regenInFlight.add(bukkitPositionInfo.getChunkKey()))
@@ -51,6 +55,21 @@ public class ChunkRegeneration {
 
     public static void releaseInFlight(String worldName, int chunkX, int chunkZ) {
         regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
+    }
+
+    /**
+     * FAWE 異常路徑用：同時釋放 regenInFlight 和當初加的 81 個 chunk tickets。
+     * 必須從安全的執行緒呼叫 removePluginChunkTicket，因此排程到 GLOBAL（非 async）。
+     */
+    public static void releaseInFlightWithTickets(org.bukkit.World world, int chunkX, int chunkZ) {
+        releaseInFlight(world.getName(), chunkX, chunkZ);
+        ScheduleUtil.GLOBAL.runTask(instance, () -> {
+            for (int x = -radius; x < (radius + 1); x++) {
+                for (int z = -radius; z < (radius + 1); z++) {
+                    world.removePluginChunkTicket(chunkX + x, chunkZ + z, instance);
+                }
+            }
+        });
     }
 
     public static void regenerateChunk(BukkitPositionInfo bukkitPositionInfo) {
@@ -154,16 +173,21 @@ public class ChunkRegeneration {
 
         // We can offload it to other thread if not on folia
         if (!Util.isFolia()) {
+            AtomicReference<ChunkSnapshot> oldRef = new AtomicReference<>(oldChunkSnapshot);
+            AtomicReference<ChunkSnapshot> newRef = new AtomicReference<>(newChunkSnapshot);
             ScheduleUtil.GLOBAL.runTaskAsynchronously(instance, () -> {
-                ElytraRegeneration.isEndShip(integrations, chunk, newChunkSnapshot);
+                ChunkSnapshot old = oldRef.getAndSet(null);
+                ChunkSnapshot nw  = newRef.getAndSet(null);
 
-                StructureRegeneration.savingMovableStructure(chunk, oldChunkSnapshot);
+                ElytraRegeneration.isEndShip(integrations, chunk, nw);
+
+                StructureRegeneration.savingMovableStructure(chunk, old);
 
                 if (!integrations.isEmpty() && !bypassClaimCheck)
-                    landOldStateRevert(integrations, chunk, oldChunkSnapshot, nbtWithPos);
+                    landOldStateRevert(integrations, chunk, old, nbtWithPos);
 
                 if (!IntegrationUtil.getLoggingIntegrations().isEmpty())
-                    coreProtectAPILogging(chunk, oldChunkSnapshot);
+                    coreProtectAPILogging(chunk, old);
             });
         } else {
             ElytraRegeneration.isEndShip(integrations, chunk, newChunkSnapshot);
@@ -182,8 +206,20 @@ public class ChunkRegeneration {
 
     private static void coreProtectAPILogging(Chunk chunk, ChunkSnapshot oldChunkSnapshot) {
         synchronized (blockDataChangeWithPos) {
+            // 計算本次可新增的預算，避免 ConcurrentLinkedQueue.size() 在迴圈內被重複呼叫（O(n)）
+            int budget = MAX_LOGGING_QUEUE - blockDataChangeWithPos.size();
+            if (budget <= 0) {
+                NatureReviveComponentLogger.warning("blockDataChangeWithPos 佇列過大，跳過此區塊的日誌記錄 (%s %d %d)",
+                        chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+                return;
+            }
+
+            int added = 0;
+            int minY = nmsWrapper.getWorldMinHeight(chunk.getWorld());
+            int maxY = chunk.getWorld().getMaxHeight();
+            outer:
             for (int x = 0; x < 16; x++) {
-                for (int y = nmsWrapper.getWorldMinHeight(chunk.getWorld()); y < chunk.getWorld().getMaxHeight(); y++) {
+                for (int y = minY; y < maxY; y++) {
                     for (int z = 0; z < 16; z++) {
                         Block newBlock = chunk.getBlock(x, y, z);
 
@@ -191,22 +227,24 @@ public class ChunkRegeneration {
                         Material newBlockType = newBlock.getType();
 
                         if (OreBlocksCompat.contains(oldBlockType)) continue;
-
                         if (oldBlockType.equals(newBlockType)) continue;
+
+                        if (added >= budget) {
+                            NatureReviveComponentLogger.warning("blockDataChangeWithPos 佇列預算耗盡，略過剩餘方塊日誌 (%s %d %d)",
+                                    chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+                            break outer;
+                        }
 
                         Location location = new Location(chunk.getWorld(), (chunk.getX() << 4) + x, y, (chunk.getZ() << 4) + z);
                         BlockData oldBlockData = oldChunkSnapshot.getBlockData(x, y, z);
                         BlockData newBlockData = newBlock.getBlockData();
                         if (oldBlockType.equals(Material.AIR)) {
-                            // new block put
-                            //coreProtectAPI.logPlacement(readonlyConfig.coreProtectUserName, location, newBlockType, newBlock.getBlockData());
                             blockDataChangeWithPos.add(new BlockDataChangeWithPos(location, oldBlockData, newBlockData, BlockDataChangeWithPos.Type.PLACEMENT));
                         } else {
-                            // Block break
-
                             blockDataChangeWithPos.add(new BlockDataChangeWithPos(location, oldBlockData, newBlockData,
                                     newBlockType.equals(Material.AIR) ? BlockDataChangeWithPos.Type.REMOVAL : BlockDataChangeWithPos.Type.REPLACE));
                         }
+                        added++;
                     }
                 }
             }
@@ -214,6 +252,11 @@ public class ChunkRegeneration {
     }
 
     private static void landOldStateRevert(List<ILandPluginIntegration> integration, Chunk chunk, ChunkSnapshot oldChunkSnapshot, List<NbtWithPos> tileEntities) {
+        if (blockStateWithPosQueue.size() > MAX_BLOCK_PUT_QUEUE) {
+            NatureReviveComponentLogger.warning("blockStateWithPosQueue 佇列過大 (%d)，跳過此區塊的領地還原 (%s %d %d)",
+                    blockStateWithPosQueue.size(), chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+            return;
+        }
         Map<Location, BlockData> preservedBlocks = new HashMap<>();
 
         if (integration.stream().anyMatch(i -> i.checkHasLand(chunk))) {
@@ -238,11 +281,22 @@ public class ChunkRegeneration {
 
     public static void setBlocksSynchronous(Map<Location, BlockData> preservedBlocks, List<NbtWithPos> tileEntities) {
         synchronized (blockStateWithPosQueue) {
+            int budget = MAX_BLOCK_PUT_QUEUE - blockStateWithPosQueue.size();
+            if (budget <= 0) {
+                NatureReviveComponentLogger.warning("blockStateWithPosQueue 佇列過大，略過 %d 個方塊還原項目", preservedBlocks.size());
+                return;
+            }
+            int added = 0;
             for (Location location : preservedBlocks.keySet()) {
+                if (added >= budget) {
+                    NatureReviveComponentLogger.warning("blockStateWithPosQueue 預算耗盡，略過剩餘 %d 個方塊還原項目", preservedBlocks.size() - added);
+                    break;
+                }
                 boolean findTheNbt = isFindTheNbt(preservedBlocks, tileEntities, location);
 
                 if (!findTheNbt)
                     blockStateWithPosQueue.add(new BlockStateWithPos(nmsWrapper.convertBlockDataToBlockState(preservedBlocks.get(location)), location));
+                added++;
             }
         }
     }
