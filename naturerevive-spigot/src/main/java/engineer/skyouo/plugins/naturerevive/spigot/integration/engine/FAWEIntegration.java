@@ -31,7 +31,7 @@ public class FAWEIntegration implements IEngineIntegration {
 
         if (plugin != null) {
             String version = plugin.getDescription().getVersion()
-                    .split(";")[0].split("-")[0];
+                    .split(";")[0].split("-")[0].split("\\+")[0];
             List<Integer> num = Arrays.stream(version.split("\\."))
                     .map(Integer::valueOf)
                     .toList();
