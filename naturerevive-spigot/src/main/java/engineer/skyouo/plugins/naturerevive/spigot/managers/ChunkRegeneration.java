@@ -89,18 +89,20 @@ public class ChunkRegeneration {
         // Thanks to xuan
         int centerX = location.getBlockX() >> 4;
         int centerZ = location.getBlockZ() >> 4;
+
+        if (!world.isChunkGenerated(centerX, centerZ)) {
+            finalizeRegen(world.getName(), centerX, centerZ);
+            return;
+        }
+
         for (int x = -radius; x < (radius + 1); x++) {
             for (int z = -radius; z < (radius + 1); z++) {
-                world.addPluginChunkTicket(centerX + x, centerZ + z, instance);
+                if (world.isChunkGenerated(centerX + x, centerZ + z))
+                    world.addPluginChunkTicket(centerX + x, centerZ + z, instance);
             }
         }
 
         Chunk chunk = location.getChunk();
-
-        if (!location.getWorld().isChunkGenerated(chunk.getX(), chunk.getZ())) {
-            finalizeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
-            return;
-        }
 
         boolean checkBiomes = !readonlyConfig.ignoredBiomes.isEmpty();
         ChunkSnapshot oldChunkSnapshot = chunk.getChunkSnapshot(checkBiomes, checkBiomes, false);
