@@ -19,6 +19,7 @@ command:
   debug:
     status-header: "NatureRevive 運行狀態：\n"
     queue-size: "- 隊列大小：%s"
+    in-flight-size: "- 執行中標記數量（regenInFlight）：%s"
     chunk-regen-date: "- 您腳下的 chunk 之重生日期：%s"
     chunk-queue-position: "- 您腳下的 chunk 於隊列的位置為：%s"
     queue-position-none: "無"

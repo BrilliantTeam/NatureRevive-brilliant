@@ -59,6 +59,7 @@ public class DebugCommand implements SubCommand {
 
         sender.sendMessage(Lang.get("command.debug.status-header"));
         sender.sendMessage(Lang.get("command.debug.queue-size", NatureRevivePlugin.queue.size()));
+        sender.sendMessage(Lang.get("command.debug.in-flight-size", NatureRevivePlugin.regenInFlight.size()));
 
         if ((sender instanceof Player player)) {
             BukkitPositionInfo positionInfo = NatureRevivePlugin.databaseConfig.get(player.getLocation());
