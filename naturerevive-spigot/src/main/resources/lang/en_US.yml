@@ -21,6 +21,7 @@ command:
   debug:
     status-header: "NatureRevive status:\n"
     queue-size: "- Queue size: %s"
+    in-flight-size: "- In-flight marker count (regenInFlight): %s"
     chunk-regen-date: "- Regeneration date of the chunk you are standing on: %s"
     chunk-queue-position: "- Queue position of the chunk you are standing on: %s"
     queue-position-none: "none"

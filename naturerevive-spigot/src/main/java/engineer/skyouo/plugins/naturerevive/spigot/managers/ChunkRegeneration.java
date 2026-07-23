@@ -86,6 +86,12 @@ public class ChunkRegeneration {
         List<NbtWithPos> nbtWithPos = new ArrayList<>();
 
         World world = location.getWorld();
+
+        if (world == null) {
+            finalizeRegen(bukkitPositionInfo.getWorldName(), bukkitPositionInfo.getX(), bukkitPositionInfo.getZ());
+            return;
+        }
+
         // Thanks to xuan
         int centerX = location.getBlockX() >> 4;
         int centerZ = location.getBlockZ() >> 4;

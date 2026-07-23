@@ -27,12 +27,17 @@ public class RegenTask implements Task {
         for (int i = 0; i < readonlyConfig.taskPerProcess && queue.hasNext(); i++) {
             BukkitPositionInfo task = queue.pop();
 
-            if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getLocation().getWorld().getName())) {
+            if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getWorldName())) {
                 regenInFlight.remove(task.getChunkKey());
                 continue;
             }
 
-            if (readonlyConfig.ignoredWorld.contains(task.getLocation().getWorld().getName())) {
+            if (readonlyConfig.ignoredWorld.contains(task.getWorldName())) {
+                regenInFlight.remove(task.getChunkKey());
+                continue;
+            }
+
+            if (Bukkit.getWorld(task.getWorldName()) == null) {
                 regenInFlight.remove(task.getChunkKey());
                 continue;
             }

@@ -39,7 +39,7 @@ public class YamlDatabaseAdapter implements DatabaseConfig {
     }
 
     public BukkitPositionInfo get(BukkitPositionInfo positionInfo) {
-        return (BukkitPositionInfo) configuration.get(safeFormatLocation(positionInfo), positionInfo);
+        return (BukkitPositionInfo) configuration.get(safeFormatLocation(positionInfo));
     }
 
     public List<BukkitPositionInfo> values() {
