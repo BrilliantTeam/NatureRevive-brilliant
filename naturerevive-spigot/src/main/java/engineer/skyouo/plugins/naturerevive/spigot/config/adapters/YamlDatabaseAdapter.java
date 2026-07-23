@@ -27,7 +27,7 @@ public class YamlDatabaseAdapter implements DatabaseConfig {
     }
 
     public void set(BukkitPositionInfo positionInfo) {
-        configuration.set(formatLocation(positionInfo.getLocation()), positionInfo);
+        configuration.set(safeFormatLocation(positionInfo), positionInfo);
     }
 
     public void unset(BukkitPositionInfo positionInfo) {
@@ -39,7 +39,7 @@ public class YamlDatabaseAdapter implements DatabaseConfig {
     }
 
     public BukkitPositionInfo get(BukkitPositionInfo positionInfo) {
-        return (BukkitPositionInfo) configuration.get(formatLocation(positionInfo.getLocation()), positionInfo);
+        return (BukkitPositionInfo) configuration.get(safeFormatLocation(positionInfo), positionInfo);
     }
 
     public List<BukkitPositionInfo> values() {
