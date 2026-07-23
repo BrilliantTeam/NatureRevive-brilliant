@@ -42,7 +42,7 @@ public class RegenQueueCheckTask implements Task {
 
                         try {
                             BukkitPositionInfo positionInfo =
-                                    databaseConfig.get(new BukkitPositionInfo(player.getWorld().getName(), player.getLocation().getChunk().getX() + x, player.getLocation().getChunk().getZ() + z, 0).getLocation());
+                                    databaseConfig.get(new BukkitPositionInfo(player.getWorld().getName(), player.getLocation().getChunk().getX() + x, player.getLocation().getChunk().getZ() + z, 0));
 
                             if (positionInfo == null)
                                 continue;
