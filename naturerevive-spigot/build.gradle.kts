@@ -20,8 +20,8 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://oss.sonatype.org/content/repositories/central")
     maven("https://maven.playpro.com")
+    //maven("https://repo.glaremasters.me/repository/bloodshot")
     maven("https://jitpack.io")
-    maven("https://repo.glaremasters.me/repository/bloodshot")
     mavenCentral()
 }
 
@@ -36,7 +36,7 @@ dependencies {
 
     compileOnly("net.coreprotect:coreprotect:21.0")
     compileOnly("com.github.TechFortress:GriefPrevention:16.18")
-    compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
+    compileOnly(files("libs/GriefDefenderAPI-2.1.0-SNAPSHOT.jar")) //compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
     compileOnly(files("libs/Residence5.1.5.0.jar"))
 
     implementation(project(":naturerevive-common"))
