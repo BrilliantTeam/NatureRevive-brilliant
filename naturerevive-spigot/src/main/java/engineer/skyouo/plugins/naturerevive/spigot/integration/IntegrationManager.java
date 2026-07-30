@@ -5,6 +5,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.api.IIntegrationManager;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.DefaultEngineIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.FAWEIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ChunkClaimIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefDefenderIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefPreventionIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ResidenceIntegration;
@@ -27,6 +28,7 @@ public class IntegrationManager implements IIntegrationManager {
         builtinDependencies.add(new ResidenceIntegration());
         builtinDependencies.add(new GriefDefenderIntegration());
         builtinDependencies.add(new GriefPreventionIntegration());
+        builtinDependencies.add(new ChunkClaimIntegration());
         builtinDependencies.add(new DefaultEngineIntegration());
         builtinDependencies.add(new FAWEIntegration());
     }
@@ -37,11 +39,11 @@ public class IntegrationManager implements IIntegrationManager {
             boolean result = false;
             try {
                 result = registerIntegration(plugin, dependency);
-            } catch (Exception ignored) {
+            } catch (Exception | LinkageError ignored) {
                 unregisterIntegration(plugin, dependency);
             }
 
-            if (result) {
+            if (result && !(dependency instanceof DefaultEngineIntegration)) {
                 NatureReviveComponentLogger.info(
                         Lang.get("console.integration-loaded", dependency.getPluginName())
                 );

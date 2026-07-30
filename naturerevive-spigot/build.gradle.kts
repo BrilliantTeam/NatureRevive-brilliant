@@ -38,6 +38,7 @@ dependencies {
     compileOnly("com.github.TechFortress:GriefPrevention:16.18")
     compileOnly(files("libs/GriefDefenderAPI-2.1.0-SNAPSHOT.jar")) //compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
     compileOnly(files("libs/Residence5.1.5.0.jar"))
+    compileOnly(files("libs/ChunkClaimPlugin-0.7.0.jar")) // CCP 沒有 maven artifact，只能 vendor jar
 
     implementation(project(":naturerevive-common"))
 
