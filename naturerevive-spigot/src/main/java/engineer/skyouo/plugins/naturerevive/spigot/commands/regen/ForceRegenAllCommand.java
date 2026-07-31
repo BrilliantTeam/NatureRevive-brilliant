@@ -13,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 public class ForceRegenAllCommand implements SubCommand {
@@ -31,7 +32,7 @@ public class ForceRegenAllCommand implements SubCommand {
             return true;
         }
 
-        List<BukkitPositionInfo> positionInfos = NatureRevivePlugin.databaseConfig.values();
+        Collection<BukkitPositionInfo> positionInfos = NatureRevivePlugin.databaseConfig.values();
         for (BukkitPositionInfo positionInfo : positionInfos) {
             positionInfo.setTTL(0);
             ChunkRegeneration.enqueue(positionInfo);

@@ -120,11 +120,11 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
         return null;
     }
 
-    public List<BukkitPositionInfo> values() {
+    public Collection<BukkitPositionInfo> values() {
         List<BukkitPositionInfo> positionInfos = new ArrayList<>();
 
         if (!cache.isEmpty())
-            return new ArrayList<>(cache.values());
+            return Collections.unmodifiableCollection(cache.values());
 
         try {
             ResultSet resultSet = connection.createStatement()

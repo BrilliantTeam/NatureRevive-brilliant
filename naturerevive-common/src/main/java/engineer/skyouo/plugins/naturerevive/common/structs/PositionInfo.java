@@ -15,6 +15,10 @@ public class PositionInfo {
     }
 
     public boolean isOverTTL() {
-        return System.currentTimeMillis() > ttl;
+        return isOverTTL(System.currentTimeMillis());
+    }
+
+    public boolean isOverTTL(long now) {
+        return now > ttl;
     }
 }

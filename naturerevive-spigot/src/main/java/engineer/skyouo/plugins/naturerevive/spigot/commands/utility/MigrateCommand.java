@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
@@ -68,7 +69,7 @@ public class MigrateCommand implements SubCommand {
                         )
                 );
 
-                List<BukkitPositionInfo> sourceData = NatureRevivePlugin.databaseConfig.values();
+                Collection<BukkitPositionInfo> sourceData = NatureRevivePlugin.databaseConfig.values();
 
                 if (config instanceof SQLDatabaseAdapter adapter) {
                     List<SQLCommand> sqlCommands = new ArrayList<>(sourceData.size());

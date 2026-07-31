@@ -109,11 +109,11 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     }
 
 
-    public List<BukkitPositionInfo> values() {
+    public Collection<BukkitPositionInfo> values() {
         ArrayList<BukkitPositionInfo> BukkitPositionInfos = new ArrayList<>();
 
         if (!cache.isEmpty())
-            return List.copyOf(cache.values());
+            return Collections.unmodifiableCollection(cache.values());
 
         try (Connection connection = hikari.getConnection(); Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement

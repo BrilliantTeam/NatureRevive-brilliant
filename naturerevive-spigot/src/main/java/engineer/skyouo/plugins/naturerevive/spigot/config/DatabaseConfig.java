@@ -5,7 +5,7 @@ import org.bukkit.Location;
 
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 public interface DatabaseConfig {
     void set(BukkitPositionInfo positionInfo);
@@ -16,7 +16,7 @@ public interface DatabaseConfig {
 
     BukkitPositionInfo get(BukkitPositionInfo positionInfo);
 
-    List<BukkitPositionInfo> values();
+    Collection<BukkitPositionInfo> values();
 
     void save() throws IOException;
 

@@ -6,8 +6,8 @@ import engineer.skyouo.plugins.naturerevive.spigot.tasks.Task;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.sql.SQLException;
 
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
@@ -18,7 +18,7 @@ public class RegenQueueCheckTask implements Task {
         if (databaseConfig == null) return;
 
         if (!readonlyConfig.regenerationStrategy.equalsIgnoreCase("passive") && !readonlyConfig.regenerationStrategy.equalsIgnoreCase("average")) {
-            List<BukkitPositionInfo> positionInfos;
+            Collection<BukkitPositionInfo> positionInfos;
             
             try {
                 positionInfos = databaseConfig.values();
@@ -26,8 +26,9 @@ public class RegenQueueCheckTask implements Task {
                 positionInfos = Collections.emptyList();
             }
 
+            long now = System.currentTimeMillis();
             for (BukkitPositionInfo positionInfo : positionInfos) {
-                if (positionInfo.isOverTTL()) {
+                if (positionInfo.isOverTTL(now)) {
                     ChunkRegeneration.enqueue(positionInfo);
                 }
             }

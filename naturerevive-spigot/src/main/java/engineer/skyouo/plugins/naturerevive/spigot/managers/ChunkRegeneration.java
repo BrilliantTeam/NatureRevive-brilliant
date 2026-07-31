@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.*;
 
 public class ChunkRegeneration {
-    private static int radius = 8;
+    private static int radius = 2;
 
     private static final int MAX_LOGGING_QUEUE  = 50_000;
     private static final int MAX_BLOCK_PUT_QUEUE = 10_000;
@@ -38,8 +38,7 @@ public class ChunkRegeneration {
     private static final int MAX_GENERATED_CACHE_PER_WORLD = 65_536;
     private static final Map<String, Set<Long>> generatedChunkCache = new ConcurrentHashMap<>();
 
-    private static boolean isChunkGeneratedCached(World world, int chunkX, int chunkZ) {
-        Set<Long> known = generatedChunkCache.computeIfAbsent(world.getName(), k -> ConcurrentHashMap.newKeySet());
+    private static boolean isChunkGeneratedCached(Set<Long> known, World world, int chunkX, int chunkZ) {
         long key = Chunk.getChunkKey(chunkX, chunkZ);
 
         if (known.contains(key)) return true;
@@ -73,10 +72,6 @@ public class ChunkRegeneration {
         regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
     }
 
-    /**
-     * FAWE 異常路徑用：同時釋放 regenInFlight 和當初加的 81 個 chunk tickets。
-     * 必須從安全的執行緒呼叫 removePluginChunkTicket，因此排程到 GLOBAL（非 async）。
-     */
     public static void releaseInFlightWithTickets(org.bukkit.World world, int chunkX, int chunkZ) {
         releaseInFlight(world.getName(), chunkX, chunkZ);
         ScheduleUtil.GLOBAL.runTask(instance, () -> {
@@ -112,14 +107,16 @@ public class ChunkRegeneration {
         int centerX = location.getBlockX() >> 4;
         int centerZ = location.getBlockZ() >> 4;
 
-        if (!isChunkGeneratedCached(world, centerX, centerZ)) {
+        Set<Long> generated = generatedChunkCache.computeIfAbsent(world.getName(), k -> ConcurrentHashMap.newKeySet());
+
+        if (!isChunkGeneratedCached(generated, world, centerX, centerZ)) {
             finalizeRegen(world.getName(), centerX, centerZ);
             return;
         }
 
         for (int x = -radius; x < (radius + 1); x++) {
             for (int z = -radius; z < (radius + 1); z++) {
-                if (isChunkGeneratedCached(world, centerX + x, centerZ + z))
+                if (isChunkGeneratedCached(generated, world, centerX + x, centerZ + z))
                     world.addPluginChunkTicket(centerX + x, centerZ + z, instance);
             }
         }

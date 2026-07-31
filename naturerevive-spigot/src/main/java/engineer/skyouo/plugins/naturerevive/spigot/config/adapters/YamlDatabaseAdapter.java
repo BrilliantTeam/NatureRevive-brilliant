@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 public class YamlDatabaseAdapter implements DatabaseConfig {
@@ -42,7 +42,7 @@ public class YamlDatabaseAdapter implements DatabaseConfig {
         return (BukkitPositionInfo) configuration.get(safeFormatLocation(positionInfo));
     }
 
-    public List<BukkitPositionInfo> values() {
+    public Collection<BukkitPositionInfo> values() {
         ArrayList<BukkitPositionInfo> positionInfos = new ArrayList<>();
         Set<String> keys = configuration.getKeys(false);
 
