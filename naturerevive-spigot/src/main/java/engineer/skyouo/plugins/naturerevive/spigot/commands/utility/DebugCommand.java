@@ -4,6 +4,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.commands.SubCommand;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.MySQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndex;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import org.bukkit.Chunk;
 import org.bukkit.command.Command;
@@ -60,6 +61,7 @@ public class DebugCommand implements SubCommand {
         sender.sendMessage(Lang.get("command.debug.status-header"));
         sender.sendMessage(Lang.get("command.debug.queue-size", NatureRevivePlugin.queue.size()));
         sender.sendMessage(Lang.get("command.debug.in-flight-size", NatureRevivePlugin.regenInFlight.size()));
+        sender.sendMessage(Lang.get("command.debug.expiry-index-size", ExpiryIndex.size()));
 
         if ((sender instanceof Player player)) {
             BukkitPositionInfo positionInfo = NatureRevivePlugin.databaseConfig.get(player.getLocation());

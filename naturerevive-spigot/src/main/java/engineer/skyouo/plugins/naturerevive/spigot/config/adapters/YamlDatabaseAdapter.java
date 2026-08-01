@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 import engineer.skyouo.plugins.naturerevive.spigot.config.DatabaseConfig;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndex;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -27,7 +28,12 @@ public class YamlDatabaseAdapter implements DatabaseConfig {
     }
 
     public void set(BukkitPositionInfo positionInfo) {
-        configuration.set(safeFormatLocation(positionInfo), positionInfo);
+        String key = safeFormatLocation(positionInfo);
+
+        boolean isNew = configuration.get(key) == null;
+        configuration.set(key, positionInfo);
+
+        if (isNew) ExpiryIndex.add(positionInfo);
     }
 
     public void unset(BukkitPositionInfo positionInfo) {

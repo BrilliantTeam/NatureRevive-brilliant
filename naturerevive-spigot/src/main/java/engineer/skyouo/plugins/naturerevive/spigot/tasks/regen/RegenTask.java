@@ -4,6 +4,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureReviveComponentLogger;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ILandPluginIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import engineer.skyouo.plugins.naturerevive.spigot.tasks.Task;
 import engineer.skyouo.plugins.naturerevive.spigot.util.ScheduleUtil;
@@ -28,17 +29,17 @@ public class RegenTask implements Task {
             BukkitPositionInfo task = queue.pop();
 
             if (!readonlyConfig.allowedWorld.isEmpty() && !readonlyConfig.allowedWorld.contains(task.getWorldName())) {
-                regenInFlight.remove(task.getChunkKey());
+                ChunkRegeneration.parkUntilRestart(task.getWorldName(), task.getX(), task.getZ());
                 continue;
             }
 
             if (readonlyConfig.ignoredWorld.contains(task.getWorldName())) {
-                regenInFlight.remove(task.getChunkKey());
+                ChunkRegeneration.parkUntilRestart(task.getWorldName(), task.getX(), task.getZ());
                 continue;
             }
 
             if (Bukkit.getWorld(task.getWorldName()) == null) {
-                regenInFlight.remove(task.getChunkKey());
+                ChunkRegeneration.parkUntilRestart(task.getWorldName(), task.getX(), task.getZ());
                 continue;
             }
 
@@ -50,8 +51,7 @@ public class RegenTask implements Task {
                         );
 
                 if (hasLandProtection) {
-                    databaseConfig.unset(task);
-                    regenInFlight.remove(task.getChunkKey());
+                    ChunkRegeneration.completeRegen(task.getWorldName(), task.getX(), task.getZ());
                     NatureReviveComponentLogger.debug("Skipped (land) and removed from DB: %s", TextColor.fromHexString("#AAAAAA"), task);
                     return;
                 }

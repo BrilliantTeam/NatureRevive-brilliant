@@ -57,7 +57,9 @@ public class ChunkRegeneration {
         return true;
     }
 
-    private static void finalizeRegen(String worldName, int chunkX, int chunkZ) {
+    public static final long RETRY_BACKOFF_MS = 5 * 60 * 1000L;
+
+    public static void completeRegen(String worldName, int chunkX, int chunkZ) {
         if (databaseConfig != null) {
             try {
                 databaseConfig.unset(new BukkitPositionInfo(worldName, chunkX, chunkZ, 0));
@@ -68,12 +70,30 @@ public class ChunkRegeneration {
         regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
     }
 
-    public static void releaseInFlight(String worldName, int chunkX, int chunkZ) {
+    public static void retryLater(String worldName, int chunkX, int chunkZ) {
         regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
+
+        if (databaseConfig == null) return;
+
+        BukkitPositionInfo retry = new BukkitPositionInfo(worldName, chunkX, chunkZ,
+                System.currentTimeMillis() + RETRY_BACKOFF_MS);
+
+        try {
+            databaseConfig.set(retry);
+            ExpiryIndex.add(retry);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static void parkUntilRestart(String worldName, int chunkX, int chunkZ) {
+        regenInFlight.remove(worldName + ":" + chunkX + ":" + chunkZ);
+
+        NatureReviveComponentLogger.debug("Parked %s:%d:%d (world unloaded or blacklisted): kept in database, left the expiry index until next startup.",
+                worldName, chunkX, chunkZ);
     }
 
     public static void releaseInFlightWithTickets(org.bukkit.World world, int chunkX, int chunkZ) {
-        releaseInFlight(world.getName(), chunkX, chunkZ);
+        retryLater(world.getName(), chunkX, chunkZ);
         ScheduleUtil.GLOBAL.runTask(instance, () -> {
             for (int x = -radius; x < (radius + 1); x++) {
                 for (int z = -radius; z < (radius + 1); z++) {
@@ -99,7 +119,7 @@ public class ChunkRegeneration {
         World world = location.getWorld();
 
         if (world == null) {
-            finalizeRegen(bukkitPositionInfo.getWorldName(), bukkitPositionInfo.getX(), bukkitPositionInfo.getZ());
+            completeRegen(bukkitPositionInfo.getWorldName(), bukkitPositionInfo.getX(), bukkitPositionInfo.getZ());
             return;
         }
 
@@ -110,7 +130,7 @@ public class ChunkRegeneration {
         Set<Long> generated = generatedChunkCache.computeIfAbsent(world.getName(), k -> ConcurrentHashMap.newKeySet());
 
         if (!isChunkGeneratedCached(generated, world, centerX, centerZ)) {
-            finalizeRegen(world.getName(), centerX, centerZ);
+            completeRegen(world.getName(), centerX, centerZ);
             return;
         }
 
@@ -139,7 +159,7 @@ public class ChunkRegeneration {
                                 }
                             }
 
-                            finalizeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+                            completeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
                             return;
                         }
                     }
@@ -170,7 +190,7 @@ public class ChunkRegeneration {
                 regenerateAfterWork(chunk, oldChunkSnapshot, integrations, nbtWithPos, bypassClaimCheck);
             });
         } catch (Exception ex) {
-            releaseInFlight(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+            retryLater(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 
             NatureReviveComponentLogger.warning(Lang.get("console.chunk-regen-error",
                     chunk.getWorld().getName(), chunk.getX(), chunk.getZ()));
@@ -185,7 +205,7 @@ public class ChunkRegeneration {
             }
         }
 
-        finalizeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+        completeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 
         if (readonlyConfig.enableOreObfuscation)
             ObfuscateLootListener.randomizeChunkOre(chunk);

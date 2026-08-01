@@ -2,6 +2,7 @@ package engineer.skyouo.plugins.naturerevive.spigot;
 
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndex;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 
 import java.io.File;
@@ -59,6 +60,7 @@ public class SuspendedZone {
             } else {
                 task.setTTL(System.currentTimeMillis() + (task.getTTL() - frozenTimeStartMs));
                 toUpdate.add(task);
+                ExpiryIndex.add(task);
             }
         }
 

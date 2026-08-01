@@ -19,6 +19,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.constants.OreBlocksCompat;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationManager;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.IntegrationUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndex;
 import engineer.skyouo.plugins.naturerevive.spigot.lang.LanguageManager;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ChunkRelatedEventListener;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ObfuscateLootListener;
@@ -41,10 +42,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
     public static boolean enableRevive = true;
@@ -107,11 +108,13 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
             OreBlocksCompat.addMaterial(ore);
         }
 
-        queue = new Queue<>(new PriorityQueue<>((i, j) -> {
+        queue = new Queue<>(new PriorityBlockingQueue<>(256, (i, j) -> {
             long comp = i.getTTL() - j.getTTL();
 
             return comp > 0 ? 1 : comp < 0 ? -1 : 0;
         }));
+
+        ExpiryIndex.seed(databaseConfig.values());
 
         suspendedZone = new SuspendedZone();
         integrationManager = new IntegrationManager();
@@ -214,6 +217,7 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
         if (blockDataChangeWithPos != null) blockDataChangeWithPos.clear();
         if (sqlCommandQueue != null)        sqlCommandQueue.clear();
         regenInFlight.clear();
+        ExpiryIndex.clear();
     }
 
     private boolean registerCommand(String commandName, CommandExecutor executor) {

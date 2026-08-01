@@ -2,6 +2,7 @@ package engineer.skyouo.plugins.naturerevive.spigot.config.adapters;
 
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.config.DatabaseConfig;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndex;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.SQLCommand;
 import org.bukkit.Location;
@@ -50,7 +51,8 @@ public class SQLiteDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter
     public void set(BukkitPositionInfo positionInfo) {
         NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.INSERT));
 
-        cache.put(positionInfo.getLocation(), positionInfo);
+        if (cache.put(positionInfo.getLocation(), positionInfo) == null)
+            ExpiryIndex.add(positionInfo);
     }
 
     public void unset(BukkitPositionInfo positionInfo) {

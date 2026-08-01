@@ -38,9 +38,11 @@ dependencies {
     compileOnly("com.github.TechFortress:GriefPrevention:16.18")
     compileOnly(files("libs/GriefDefenderAPI-2.1.0-SNAPSHOT.jar")) //compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
     compileOnly(files("libs/Residence5.1.5.0.jar"))
-    compileOnly(files("libs/ChunkClaimPlugin-0.7.0.jar")) // CCP 沒有 maven artifact，只能 vendor jar
+    compileOnly(files("libs/ChunkClaimPlugin-0.7.0.jar"))
 
     implementation(project(":naturerevive-common"))
+
+    testImplementation("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
 
     // FAWE
 
@@ -49,7 +51,23 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 }
 
+val selfCheck by tasks.registering(JavaExec::class) {
+    group = "verification"
+    description = "Runs the ExpiryIndex self-check (assert based, no framework)."
+    mainClass.set("engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndexSelfCheck")
+    classpath = sourceSets["test"].runtimeClasspath
+    jvmArgs("-ea")
+}
+
 tasks {
+    named<Test>("test") {
+        enabled = false
+    }
+
+    check {
+        dependsOn(selfCheck)
+    }
+
     val copyReleaseJar by registering(Copy::class) {
         dependsOn(shadowJar)
         from(shadowJar.flatMap { it.archiveFile })

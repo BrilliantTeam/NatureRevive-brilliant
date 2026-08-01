@@ -6,6 +6,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.config.DatabaseConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BukkitPositionInfo;
 
+import engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndex;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.SQLCommand;
 import org.bukkit.Location;
 
@@ -58,7 +59,8 @@ public class MySQLDatabaseAdapter implements DatabaseConfig, SQLDatabaseAdapter 
     public void set(BukkitPositionInfo positionInfo) {
             NatureRevivePlugin.sqlCommandQueue.add(new SQLCommand(positionInfo, SQLCommand.Type.INSERT));
 
-            cache.put(positionInfo.getLocation(), positionInfo);
+            if (cache.put(positionInfo.getLocation(), positionInfo) == null)
+                ExpiryIndex.add(positionInfo);
     }
 
     public void unset(BukkitPositionInfo positionInfo) {
