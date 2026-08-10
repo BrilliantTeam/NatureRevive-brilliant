@@ -29,4 +29,20 @@ public interface INMSWrapper {
     int getWorldMinHeight(World world);
 
     Material[] getOreBlocks();
+
+    default boolean supportsInPlaceRegeneration() {
+        return false;
+    }
+
+    default Object captureRegenerationContext(World world, int chunkX, int chunkZ) {
+        throw new UnsupportedOperationException("In-place regeneration is not implemented on this Minecraft version.");
+    }
+
+    default Object prepareRegeneratedChunk(World world, int chunkX, int chunkZ, Object context) {
+        throw new UnsupportedOperationException("In-place regeneration is not implemented on this Minecraft version.");
+    }
+
+    default void applyRegeneratedChunk(World world, int chunkX, int chunkZ, Object prepared) {
+        throw new UnsupportedOperationException("In-place regeneration is not implemented on this Minecraft version.");
+    }
 }

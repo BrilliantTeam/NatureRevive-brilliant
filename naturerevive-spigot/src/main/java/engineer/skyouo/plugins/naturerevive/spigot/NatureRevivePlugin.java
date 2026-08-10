@@ -184,7 +184,8 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
 
     public static boolean checkSoftDependPlugins() {
         if (!readonlyConfig.regenerationEngine.equalsIgnoreCase("fawe") &&
-                !readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
+                !readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit") &&
+                !readonlyConfig.regenerationEngine.equalsIgnoreCase("inplace")) {
             NatureReviveComponentLogger.warning(Lang.get("console.invalid-engine"));
             return false;
         }

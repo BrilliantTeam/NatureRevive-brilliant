@@ -22,8 +22,13 @@ public class DefaultEngineIntegration implements IEngineIntegration {
     }
 
     @Override
+    public String getEngineName() {
+        return "bukkit";
+    }
+
+    @Override
     public boolean isEnabled() {
-        return Util.isPaper() && NatureRevivePlugin.readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit");
+        return Util.isPaper() && IEngineIntegration.super.isEnabled();
     }
 
     @Override

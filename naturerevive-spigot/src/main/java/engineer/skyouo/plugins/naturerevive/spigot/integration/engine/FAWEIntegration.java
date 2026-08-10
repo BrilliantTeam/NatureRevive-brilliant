@@ -49,13 +49,13 @@ public class FAWEIntegration implements IEngineIntegration {
     }
 
     @Override
-    public boolean isEnabled() {
-        return NatureRevivePlugin.readonlyConfig.regenerationEngine.equalsIgnoreCase("fawe");
+    public String getEngineName() {
+        return "fawe";
     }
 
     @Override
     public boolean shouldExitOnFatal() {
-        return NatureRevivePlugin.readonlyConfig.regenerationEngine.equalsIgnoreCase("fawe");
+        return isEnabled();
     }
 
     @Override

@@ -88,9 +88,11 @@ public class RegenThisChunkCommand implements SubCommand {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (VersionUtil.isAtLeast(1, 21, 0)) {
-            return List.of("fawe");
-        }
-        return List.of("bukkit", "fawe");
+        return NatureRevivePlugin.integrationManager.getAvailableDependencies(IDependency.Type.ENGINE)
+                .stream()
+                .map(dependency -> ((IEngineIntegration) dependency).getEngineName())
+                .filter(name -> !name.equalsIgnoreCase("bukkit") || !VersionUtil.isAtLeast(1, 21, 0))
+                .sorted()
+                .toList();
     }
 }

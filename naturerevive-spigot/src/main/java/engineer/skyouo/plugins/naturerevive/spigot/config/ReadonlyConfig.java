@@ -311,7 +311,10 @@ public class ReadonlyConfig {
                     "Change the method of regeneration, e.g. bukkit using original method, which is rapid but cause",
                     "major chunk problem (e.g. terrain break), fawe use FastAsyncWorldEdit implementation,",
                     "which have slower speed but guarantee terrain, you have to install FastAsyncWorldEdit in order to",
-                    "use fawe method."
+                    "use fawe method.",
+                    "inplace 為內建引擎，不需任何前置插件，重生時區塊不會卸載，玩家可留在區塊內；僅部分 NMS 版本支援。",
+                    "inplace is the built-in engine, needs no dependency and never unloads the chunk, so players may",
+                    "stay inside while it regenerates. Only available on some Minecraft versions."
             )));
 
             configuration.set("average-chunk-radius", 2);

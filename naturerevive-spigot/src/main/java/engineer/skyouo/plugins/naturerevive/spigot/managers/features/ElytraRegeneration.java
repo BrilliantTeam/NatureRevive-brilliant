@@ -103,8 +103,8 @@ public class ElytraRegeneration {
                             ScheduleUtil.GLOBAL.runTaskAsynchronously(instance, () ->
                                 FaweImplRegeneration.regenerate(world1, cx1, cz1, true, () -> postOtherChunkCheck(chunk1, blockFace, l)));
                         } else {
-                            chunk.getWorld().regenerateChunk(chunk1.getX(), chunk1.getZ());
-                            postOtherChunkCheck(chunk1, blockFace, l);
+                            IntegrationUtil.getRegenEngine().regenerateChunk(instance, chunk1,
+                                    () -> postOtherChunkCheck(chunk1, blockFace, l));
                         }
                     });
 

@@ -5,6 +5,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.api.IIntegrationManager;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.DefaultEngineIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.FAWEIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.InPlaceEngineIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ChunkClaimIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefDefenderIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefPreventionIntegration;
@@ -31,6 +32,7 @@ public class IntegrationManager implements IIntegrationManager {
         builtinDependencies.add(new ChunkClaimIntegration());
         builtinDependencies.add(new DefaultEngineIntegration());
         builtinDependencies.add(new FAWEIntegration());
+        builtinDependencies.add(new InPlaceEngineIntegration());
     }
 
     @Override

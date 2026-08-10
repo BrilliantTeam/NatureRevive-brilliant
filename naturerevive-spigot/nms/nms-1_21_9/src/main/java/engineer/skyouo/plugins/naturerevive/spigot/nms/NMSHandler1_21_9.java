@@ -14,12 +14,14 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftWorld;
+import net.minecraft.world.level.chunk.ProtoChunk;
 import org.bukkit.craftbukkit.block.CraftBlockStates;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public class NMSHandler1_21_9 implements INMSWrapper {
     @Override
@@ -88,5 +90,28 @@ public class NMSHandler1_21_9 implements INMSWrapper {
     @Override
     public Material[] getOreBlocks() {
         return oreBlocks;
+    }
+
+    @Override
+    public boolean supportsInPlaceRegeneration() {
+        return true;
+    }
+
+    @Override
+    public Object captureRegenerationContext(World world, int chunkX, int chunkZ) {
+        return InPlaceRegeneration1_21_9.capture(((CraftWorld) world).getHandle(), chunkX, chunkZ);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Object prepareRegeneratedChunk(World world, int chunkX, int chunkZ, Object context) {
+        return InPlaceRegeneration1_21_9.prepare(((CraftWorld) world).getHandle(), chunkX, chunkZ,
+                (Map<Long, InPlaceRegeneration1_21_9.Structures>) context);
+    }
+
+    @Override
+    public void applyRegeneratedChunk(World world, int chunkX, int chunkZ, Object prepared) {
+        InPlaceRegeneration1_21_9.apply(((CraftWorld) world).getHandle(), chunkX, chunkZ, (ProtoChunk) prepared,
+                (pos, nbt) -> loadTileEntity(world, pos.getX(), pos.getY(), pos.getZ(), nbt));
     }
 }

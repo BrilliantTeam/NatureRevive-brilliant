@@ -83,6 +83,9 @@ tasks {
 
     shadowJar {
         archiveClassifier.set("shaded")
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
 
         dependsOn(project.project(":naturerevive-spigot:nms").subprojects.map { it.tasks.named("assemble") })
         from(project(":naturerevive-spigot:nms").subprojects.map {
