@@ -208,7 +208,8 @@ public class ChunkRegeneration {
 
         completeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 
-        EndPodiumRegeneration.restoreIfAffected(chunk.getWorld(), chunk.getX(), chunk.getZ());
+        if (readonlyConfig.inPlaceRestoreEndPodium)
+            EndPodiumRegeneration.restoreIfAffected(chunk.getWorld(), chunk.getX(), chunk.getZ());
 
         if (readonlyConfig.enableOreObfuscation)
             ObfuscateLootListener.randomizeChunkOre(chunk);

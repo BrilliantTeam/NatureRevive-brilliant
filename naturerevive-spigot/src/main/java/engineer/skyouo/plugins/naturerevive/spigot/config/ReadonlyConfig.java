@@ -21,7 +21,7 @@ public class ReadonlyConfig {
 
     private YamlFile configuration;
 
-    public final int CONFIG_VERSION = 19;
+    public final int CONFIG_VERSION = 20;
 
     public boolean debug;
 
@@ -38,6 +38,18 @@ public class ReadonlyConfig {
     public boolean adaptiveLootChestReplacement;
 
     public boolean enableOreObfuscation;
+
+    public boolean inPlaceRegenerateEntities;
+
+    public boolean inPlaceClearChunkPersistentData;
+
+    public boolean inPlaceClearEntitiesBeforeRegeneration;
+
+    public boolean inPlaceClearNearbyEntitiesBeforeRegeneration;
+
+    public boolean inPlaceClearNearbyDroppedItemsBeforeRegeneration;
+
+    public boolean inPlaceRestoreEndPodium;
 
     public double minTPSCountForRegeneration;
 
@@ -119,6 +131,13 @@ public class ReadonlyConfig {
             configuration.setComment("debug", convertListStringToString(Arrays.asList("除錯模式",
                     "Debug mode, displaying verbose messages for debugging purposes.",
                     "You could disable this if you're not in development environments.")));
+
+            configuration.set("inplace-regenerate-entities", true);
+            configuration.set("inplace-clear-chunk-persistent-data", true);
+            configuration.set("inplace-clear-entities-before-regeneration", true);
+            configuration.set("inplace-clear-nearby-entities-before-regeneration", false);
+            configuration.set("inplace-clear-nearby-dropped-items-before-regeneration", false);
+            configuration.set("inplace-restore-end-podium", false);
 
             configuration.set("ttl-duration", "7d");
             configuration.setComment("ttl-duration", convertListStringToString(Arrays.asList(
@@ -677,6 +696,15 @@ public class ReadonlyConfig {
                         "所有可顯示的訊息皆定義於該語言檔內，您可自由編輯或新增語言檔。",
                         "The plugin language, corresponding to the file name in the plugins/NatureRevive/lang/ folder (e.g. zh_TW, en_US).",
                         "All displayable messages are defined in that language file; you may freely edit it or add new language files.")));
+            case 19:
+                configuration.set("inplace-regenerate-entities", true);
+                configuration.set("inplace-clear-chunk-persistent-data", true);
+                configuration.set("inplace-restore-end-podium", false);
+            case 20:
+                configuration.set("inplace-clear-entities-before-regeneration", true);
+            case 21:
+                configuration.set("inplace-clear-nearby-entities-before-regeneration", false);
+                configuration.set("inplace-clear-nearby-dropped-items-before-regeneration", false);
             default:
                 configuration.set("config-version", CONFIG_VERSION);
                 try {
@@ -701,6 +729,12 @@ public class ReadonlyConfig {
         suppressNearbyChunkCount = configuration.getInt("suppress-chunk-refresh-radius", 0); // regenerate-track-nearby-n-chunks
         coreProtectLogging = configuration.getBoolean("coreprotect-logging-enable", false); // new-options: logging.disable
         enableOreObfuscation = configuration.getBoolean("enable-ore-obfuscation", false); // ore-obfuscation.enable
+        inPlaceRegenerateEntities = configuration.getBoolean("inplace-regenerate-entities", true);
+        inPlaceClearChunkPersistentData = configuration.getBoolean("inplace-clear-chunk-persistent-data", true);
+        inPlaceClearEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-entities-before-regeneration", true);
+        inPlaceClearNearbyEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-nearby-entities-before-regeneration", false);
+        inPlaceClearNearbyDroppedItemsBeforeRegeneration = configuration.getBoolean("inplace-clear-nearby-dropped-items-before-regeneration", false);
+        inPlaceRestoreEndPodium = configuration.getBoolean("inplace-restore-end-podium", false);
 
         taskPerProcess = configuration.getInt("task-process-per-tick", 1); // regenerate-n-chunks-per-time
         queuePerNTick = configuration.getInt("queue-process-per-n-tick", 200); // regenerate-chunks-per-n-ticks

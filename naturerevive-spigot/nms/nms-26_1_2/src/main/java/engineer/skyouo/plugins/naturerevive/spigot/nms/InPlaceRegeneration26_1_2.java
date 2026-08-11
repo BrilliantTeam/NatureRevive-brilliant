@@ -280,7 +280,7 @@ final class InPlaceRegeneration26_1_2 {
     }
 
     /** Chunk thread. {@code blockEntityLoader} is the handler's own loadTileEntity. */
-    static void apply(ServerLevel level, int chunkX, int chunkZ, ProtoChunk generated, BiConsumer<BlockPos, String> blockEntityLoader) {
+    static void apply(ServerLevel level, int chunkX, int chunkZ, ProtoChunk generated, BiConsumer<BlockPos, String> blockEntityLoader, boolean regenerateEntities) {
         LevelChunk live = level.getChunkIfLoaded(chunkX, chunkZ);
         if (live == null)
             throw new IllegalStateException("Chunk %d,%d unloaded before its regeneration could be applied.".formatted(chunkX, chunkZ));
@@ -318,13 +318,29 @@ final class InPlaceRegeneration26_1_2 {
             if (nbt != null) blockEntityLoader.accept(blockEntityPos, nbt.toString());
         }
 
-        spawnGeneratedEntities(level, generated);
+        if (regenerateEntities) spawnGeneratedEntities(level, generated);
     }
 
     private static void spawnGeneratedEntities(ServerLevel level, ProtoChunk generated) {
         for (CompoundTag entityNbt : generated.getEntities()) {
             Entity entity = EntityType.loadEntityRecursive(entityNbt, level, EntitySpawnReason.LOAD, loaded -> loaded);
-            if (entity != null) level.tryAddFreshEntityWithPassengers(entity);
+            if (entity != null) {
+                if (isElytraItemFrame(entity)) continue;
+                removeUnmovedGeneratedEntities(level, entity);
+                level.tryAddFreshEntityWithPassengers(entity);
+            }
         }
+    }
+
+    private static void removeUnmovedGeneratedEntities(ServerLevel level, Entity generated) {
+        level.getEntities((Entity) null, generated.getBoundingBox().inflate(0.001D), entity ->
+                        entity.getType() == generated.getType()
+                                && entity.position().distanceToSqr(generated.position()) < 0.000001D)
+                .forEach(entity -> entity.getBukkitEntity().remove());
+    }
+
+    private static boolean isElytraItemFrame(Entity entity) {
+        return entity.getBukkitEntity() instanceof org.bukkit.entity.ItemFrame itemFrame
+                && itemFrame.getItem().getType() == org.bukkit.Material.ELYTRA;
     }
 }
