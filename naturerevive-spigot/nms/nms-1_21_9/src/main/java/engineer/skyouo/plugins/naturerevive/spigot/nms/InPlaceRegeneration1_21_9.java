@@ -6,6 +6,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.GenerationChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -27,6 +30,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -313,6 +317,13 @@ final class InPlaceRegeneration1_21_9 {
 
             CompoundTag nbt = generated.getBlockEntityNbtForSaving(blockEntityPos, level.registryAccess());
             if (nbt != null) blockEntityLoader.accept(blockEntityPos, nbt.toString());
+        }
+
+        List<CompoundTag> entities = generated.getEntities();
+        if (entities == null) return;
+        for (CompoundTag entityNbt : entities) {
+            Entity entity = EntityType.loadEntityRecursive(entityNbt, level, EntitySpawnReason.LOAD, loaded -> loaded);
+            if (entity != null) level.tryAddFreshEntityWithPassengers(entity);
         }
     }
 }

@@ -12,6 +12,9 @@ import static engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin.nms
 
 public class StructureRegeneration {
     public static void savingMovableStructure(Chunk chunk, ChunkSnapshot oldChunkSnapshot) {
+        if (chunk.getWorld().getEnvironment().equals(World.Environment.THE_END) && isInSpecialChunks(chunk))
+            return;
+
         Map<Location, BlockData> perversedBlocks = new HashMap<>();
         for (int x = 0; x < 16; x++) {
             for (int y = nmsWrapper.getWorldMinHeight(chunk.getWorld()); y < chunk.getWorld().getMaxHeight(); y++) {

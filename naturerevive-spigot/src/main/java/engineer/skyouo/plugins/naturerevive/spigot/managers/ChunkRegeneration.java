@@ -9,6 +9,7 @@ import engineer.skyouo.plugins.naturerevive.spigot.integration.engine.IEngineInt
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ILandPluginIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.listeners.ObfuscateLootListener;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.features.ElytraRegeneration;
+import engineer.skyouo.plugins.naturerevive.spigot.managers.features.EndPodiumRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.managers.features.StructureRegeneration;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BlockDataChangeWithPos;
 import engineer.skyouo.plugins.naturerevive.spigot.structs.BlockStateWithPos;
@@ -206,6 +207,8 @@ public class ChunkRegeneration {
         }
 
         completeRegen(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+
+        EndPodiumRegeneration.restoreIfAffected(chunk.getWorld(), chunk.getX(), chunk.getZ());
 
         if (readonlyConfig.enableOreObfuscation)
             ObfuscateLootListener.randomizeChunkOre(chunk);
