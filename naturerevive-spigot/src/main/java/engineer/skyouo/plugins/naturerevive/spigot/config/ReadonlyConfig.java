@@ -21,7 +21,7 @@ public class ReadonlyConfig {
 
     private YamlFile configuration;
 
-    public final int CONFIG_VERSION = 20;
+    public final int CONFIG_VERSION = 19;
 
     public boolean debug;
 
@@ -48,8 +48,6 @@ public class ReadonlyConfig {
     public boolean inPlaceClearNearbyEntitiesBeforeRegeneration;
 
     public boolean inPlaceClearNearbyDroppedItemsBeforeRegeneration;
-
-    public boolean inPlaceRestoreEndPodium;
 
     public double minTPSCountForRegeneration;
 
@@ -137,7 +135,26 @@ public class ReadonlyConfig {
             configuration.set("inplace-clear-entities-before-regeneration", true);
             configuration.set("inplace-clear-nearby-entities-before-regeneration", false);
             configuration.set("inplace-clear-nearby-dropped-items-before-regeneration", false);
-            configuration.set("inplace-restore-end-podium", false);
+            configuration.setComment("inplace-regenerate-entities", convertListStringToString(Arrays.asList(
+                    "是否再生實體（如終界水晶、戰利品礦車、展示框等）",
+                    "Whether to regenerate entities, such as end crystals, loot minecarts, and item frames."
+            )));
+            configuration.setComment("inplace-clear-chunk-persistent-data", convertListStringToString(Arrays.asList(
+                    "是否清除該 Chunk 的 PDC（適用於如礦物代換）",
+                    "Whether to clear this chunk's persistent data container."
+            )));
+            configuration.setComment("inplace-clear-entities-before-regeneration", convertListStringToString(Arrays.asList(
+                    "是否先移除該 Chunk 中的所有實體與掉落物，然後再生實體",
+                    "Whether to remove all entities and dropped items in this chunk before regenerating entities."
+            )));
+            configuration.setComment("inplace-clear-nearby-entities-before-regeneration", convertListStringToString(Arrays.asList(
+                    "是否再生時也清理附近 3×3 範圍內的一般實體",
+                    "Whether to also clear non-item entities in the surrounding 3×3 chunk area during regeneration."
+            )));
+            configuration.setComment("inplace-clear-nearby-dropped-items-before-regeneration", convertListStringToString(Arrays.asList(
+                    "是否再生時也清理附近 3×3 範圍內的掉落物",
+                    "Whether to also clear dropped items in the surrounding 3×3 chunk area during regeneration."
+            )));
 
             configuration.set("ttl-duration", "7d");
             configuration.setComment("ttl-duration", convertListStringToString(Arrays.asList(
@@ -699,12 +716,31 @@ public class ReadonlyConfig {
             case 19:
                 configuration.set("inplace-regenerate-entities", true);
                 configuration.set("inplace-clear-chunk-persistent-data", true);
-                configuration.set("inplace-restore-end-podium", false);
             case 20:
                 configuration.set("inplace-clear-entities-before-regeneration", true);
             case 21:
                 configuration.set("inplace-clear-nearby-entities-before-regeneration", false);
                 configuration.set("inplace-clear-nearby-dropped-items-before-regeneration", false);
+                configuration.setComment("inplace-regenerate-entities", convertListStringToString(Arrays.asList(
+                        "是否再生實體（如終界水晶、戰利品礦車、展示框等）",
+                        "Whether to regenerate entities, such as end crystals, loot minecarts, and item frames."
+                )));
+                configuration.setComment("inplace-clear-chunk-persistent-data", convertListStringToString(Arrays.asList(
+                        "是否清除該 Chunk 的 PDC（適用於如礦物代換）",
+                        "Whether to clear this chunk's persistent data container."
+                )));
+                configuration.setComment("inplace-clear-entities-before-regeneration", convertListStringToString(Arrays.asList(
+                        "是否先移除該 Chunk 中的所有實體與掉落物，然後再生實體",
+                        "Whether to remove all entities and dropped items in this chunk before regenerating entities."
+                )));
+                configuration.setComment("inplace-clear-nearby-entities-before-regeneration", convertListStringToString(Arrays.asList(
+                        "是否再生時也清理附近 3×3 範圍內的一般實體",
+                        "Whether to also clear non-item entities in the surrounding 3×3 chunk area during regeneration."
+                )));
+                configuration.setComment("inplace-clear-nearby-dropped-items-before-regeneration", convertListStringToString(Arrays.asList(
+                        "是否再生時也清理附近 3×3 範圍內的掉落物",
+                        "Whether to also clear dropped items in the surrounding 3×3 chunk area during regeneration."
+                )));
             default:
                 configuration.set("config-version", CONFIG_VERSION);
                 try {
@@ -734,7 +770,6 @@ public class ReadonlyConfig {
         inPlaceClearEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-entities-before-regeneration", true);
         inPlaceClearNearbyEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-nearby-entities-before-regeneration", false);
         inPlaceClearNearbyDroppedItemsBeforeRegeneration = configuration.getBoolean("inplace-clear-nearby-dropped-items-before-regeneration", false);
-        inPlaceRestoreEndPodium = configuration.getBoolean("inplace-restore-end-podium", false);
 
         taskPerProcess = configuration.getInt("task-process-per-tick", 1); // regenerate-n-chunks-per-time
         queuePerNTick = configuration.getInt("queue-process-per-n-tick", 200); // regenerate-chunks-per-n-ticks
