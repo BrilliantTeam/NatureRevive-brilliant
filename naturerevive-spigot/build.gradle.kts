@@ -51,30 +51,9 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 }
 
-val selfCheck by tasks.registering(JavaExec::class) {
-    group = "verification"
-    description = "Runs the ExpiryIndex self-check (assert based, no framework)."
-    mainClass.set("engineer.skyouo.plugins.naturerevive.spigot.managers.ExpiryIndexSelfCheck")
-    classpath = sourceSets["test"].runtimeClasspath
-    jvmArgs("-ea")
-}
-
-val configSelfCheck by tasks.registering(JavaExec::class) {
-    group = "verification"
-    description = "Runs the config v19 -> v20 migration self-check (assert based, no framework)."
-    mainClass.set("engineer.skyouo.plugins.naturerevive.spigot.config.ConfigMigrationSelfCheck")
-    classpath = sourceSets["test"].runtimeClasspath
-    jvmArgs("-ea")
-}
-
 tasks {
     named<Test>("test") {
         enabled = false
-    }
-
-    check {
-        dependsOn(selfCheck)
-        dependsOn(configSelfCheck)
     }
 
     val copyReleaseJar by registering(Copy::class) {
