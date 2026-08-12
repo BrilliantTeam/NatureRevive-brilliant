@@ -14,7 +14,7 @@ messages:
 command:
   regenchunk:
     not-player: "&c你必須是玩家才能執行此指令。"
-    bukkit-unsupported-1-21: "&c伺服器版本為 1.21+，不支援 bukkit 再生引擎，請改用 fawe。"
+    bukkit-unsupported-1-21: "&c伺服器版本為 1.21+，不支援 bukkit 再生引擎，請改用 inplace 或 fawe。"
     no-engine: "&c找不到可用的再生引擎。"
   debug:
     status-header: "NatureRevive 運行狀態：\n"
@@ -43,9 +43,10 @@ console:
   no-regen-engine: "找不到可用的重生引擎，請您確定是否正確設置 regenerate-engine 選項！"
   not-paper-1: "您運行的軟體不包含 NatureRevive 運行所需的修補！"
   not-paper-2: "建議您切換至 Paper，Paper 是 Spigot 的分支之一，包含眾多優化修補，也不須透過 BuildTools 來獲取軟體構建。"
-  invalid-engine: "請將 regeneration-strategy 修正為 bukkit 或 fawe。"
+  invalid-engine: "請將 regeneration-engine 修正為 bukkit、fawe 或 inplace。"
   bukkit-unsupported-1-21-1: "偵測到伺服器版本為 1.21+，bukkit 再生模式不受支援。"
   bukkit-unsupported-1-21-2: "已自動將再生引擎切換為 FAWE，請確保已安裝 FastAsyncWorldEdit。"
+  bukkit-switched-to-inplace: "已自動將再生引擎切換為內建的 inplace 引擎。"
   fawe-not-installed-1: "伺服器未安裝 FastAsyncWorldEdit，無法啟動 NatureRevive。"
   fawe-not-installed-2: "請安裝 FastAsyncWorldEdit 後重啟伺服器。"
   integration-loaded: "NatureRevive 成功載入 %s 插件的支援項目。"

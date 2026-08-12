@@ -192,12 +192,17 @@ public class NatureRevivePlugin extends JavaPlugin implements IAPIMain {
 
         if (VersionUtil.isAtLeast(1, 21, 0) &&
                 readonlyConfig.regenerationEngine.equalsIgnoreCase("bukkit")) {
-            NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-1"));
-            NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-2"));
-            readonlyConfig.regenerationEngine = "fawe";
-            readonlyConfig.saveRegenerationEngine("fawe");
+            boolean inPlace = nmsWrapper.supportsInPlaceRegeneration();
+            String engine = inPlace ? "inplace" : "fawe";
 
-            if (instance.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
+            NatureReviveComponentLogger.warning(Lang.get("console.bukkit-unsupported-1-21-1"));
+            NatureReviveComponentLogger.warning(Lang.get(inPlace
+                    ? "console.bukkit-switched-to-inplace"
+                    : "console.bukkit-unsupported-1-21-2"));
+            readonlyConfig.regenerationEngine = engine;
+            readonlyConfig.saveRegenerationEngine(engine);
+
+            if (!inPlace && instance.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
                 NatureReviveComponentLogger.error(Lang.get("console.fawe-not-installed-1"));
                 NatureReviveComponentLogger.error(Lang.get("console.fawe-not-installed-2"));
                 return false;

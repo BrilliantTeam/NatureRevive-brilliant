@@ -16,7 +16,7 @@ messages:
 command:
   regenchunk:
     not-player: "&cYou must be a player to run this command."
-    bukkit-unsupported-1-21: "&cServer version is 1.21+, the bukkit regeneration engine is unsupported. Please use fawe instead."
+    bukkit-unsupported-1-21: "&cServer version is 1.21+, the bukkit regeneration engine is unsupported. Please use inplace or fawe instead."
     no-engine: "&cNo available regeneration engine found."
   debug:
     status-header: "NatureRevive status:\n"
@@ -44,9 +44,10 @@ console:
   no-regen-engine: "No available regeneration engine found, please make sure the regenerate-engine option is set correctly!"
   not-paper-1: "The server software you are running does not include the patches NatureRevive requires!"
   not-paper-2: "We recommend switching to Paper. Paper is a fork of Spigot with many optimization patches, and does not require BuildTools to obtain a build."
-  invalid-engine: "Please set regeneration-strategy to bukkit or fawe."
+  invalid-engine: "Please set regeneration-engine to bukkit, fawe or inplace."
   bukkit-unsupported-1-21-1: "Detected server version 1.21+, the bukkit regeneration mode is unsupported."
   bukkit-unsupported-1-21-2: "Automatically switched the regeneration engine to FAWE, please make sure FastAsyncWorldEdit is installed."
+  bukkit-switched-to-inplace: "Automatically switched the regeneration engine to the built-in in-place engine."
   fawe-not-installed-1: "FastAsyncWorldEdit is not installed on the server, NatureRevive cannot start."
   fawe-not-installed-2: "Please install FastAsyncWorldEdit and restart the server."
   integration-loaded: "NatureRevive successfully loaded support for the %s plugin."

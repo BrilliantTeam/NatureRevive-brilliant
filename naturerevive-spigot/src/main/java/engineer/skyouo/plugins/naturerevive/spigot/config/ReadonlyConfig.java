@@ -1,5 +1,6 @@
 package engineer.skyouo.plugins.naturerevive.spigot.config;
 
+import engineer.skyouo.plugins.naturerevive.common.VersionUtil;
 import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.MySQLDatabaseAdapter;
 import engineer.skyouo.plugins.naturerevive.spigot.config.adapters.SQLiteDatabaseAdapter;
@@ -238,16 +239,18 @@ public class ReadonlyConfig {
                 "average: periodically checks the chunks around each player (radius: check-chunk-radius).",
                 "passive: only regenerates a chunk when a player loads it; cheapest, but remote chunks may never be regenerated.");
 
-        changed |= def(c, "regeneration.engine", "bukkit",
+        changed |= def(c, "regeneration.engine", defaultEngine(),
                 "重生區塊所使用的引擎，可選 bukkit / fawe / inplace。",
-                "bukkit：原版引擎，速度快，但跨版本地形可能出現斷層。",
+                "bukkit：原版引擎，速度快，但跨版本地形可能出現斷層，1.21 以上不支援。",
                 "fawe：呼叫 FastAsyncWorldEdit，速度較慢但可維持地形銜接，需安裝 FastAsyncWorldEdit。",
                 "inplace：內建引擎，無需前置插件，重生時區塊不會卸載，玩家可留在區塊內，僅部分 Minecraft 版本支援。",
+                "預設值：1.21 以上為 inplace，其餘版本為 bukkit。",
                 "The engine used to regenerate chunks: 'bukkit', 'fawe' or 'inplace'.",
-                "bukkit: vanilla method, fast, but may break terrain continuity across versions.",
+                "bukkit: vanilla method, fast, but may break terrain continuity across versions. Unsupported on 1.21+.",
                 "fawe: uses FastAsyncWorldEdit, slower but keeps terrain seamless. Requires FastAsyncWorldEdit installed.",
                 "inplace: built-in engine, needs no dependency and never unloads the chunk, so players may stay inside",
-                "while it regenerates. Only available on some Minecraft versions.");
+                "while it regenerates. Only available on some Minecraft versions.",
+                "Default: 'inplace' on 1.21+, 'bukkit' otherwise.");
 
         changed |= def(c, "regeneration.min-tps", 16.0,
                 "重生所需的最低 TPS，低於此數值時重生將暫停。",
@@ -456,6 +459,10 @@ public class ReadonlyConfig {
         return changed;
     }
 
+    public static String defaultEngine() {
+        return VersionUtil.isAtLeast(1, 21, 0) ? "inplace" : "bukkit";
+    }
+
     private static boolean def(YamlFile c, String path, Object value, String... comment) {
         boolean absent = c.get(path) == null;
 
@@ -477,7 +484,7 @@ public class ReadonlyConfig {
         spawnTimer = configuration.getString("regeneration.regenerate-at", "00:00:00-23:59:59");
         regenOffsetDuration = parseDuration(configuration.getString("regeneration.offset-max-duration", "0d"));
         regenerationStrategy = configuration.getString("regeneration.strategy", "passive");
-        regenerationEngine = configuration.getString("regeneration.engine", "bukkit");
+        regenerationEngine = configuration.getString("regeneration.engine", defaultEngine());
         minTPSCountForRegeneration = configuration.getDouble("regeneration.min-tps", 16.0);
         maxPlayersCountForRegeneration = configuration.getInt("regeneration.max-players", 40);
         chunkRegenerateRadiusOnAverageApplied = configuration.getInt("regeneration.check-chunk-radius", 2);
