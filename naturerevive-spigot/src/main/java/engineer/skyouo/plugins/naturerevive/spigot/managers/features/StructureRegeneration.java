@@ -1,6 +1,7 @@
 package engineer.skyouo.plugins.naturerevive.spigot.managers.features;
 
 import engineer.skyouo.plugins.naturerevive.spigot.managers.ChunkRegeneration;
+import engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 

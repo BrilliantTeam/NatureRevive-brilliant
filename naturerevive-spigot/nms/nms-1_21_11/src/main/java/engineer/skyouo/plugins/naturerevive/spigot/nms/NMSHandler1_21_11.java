@@ -110,8 +110,8 @@ public class NMSHandler1_21_11 implements INMSWrapper {
     }
 
     @Override
-    public void applyRegeneratedChunk(World world, int chunkX, int chunkZ, Object prepared) {
+    public void applyRegeneratedChunk(World world, int chunkX, int chunkZ, Object prepared, boolean regenerateEntities) {
         InPlaceRegeneration1_21_11.apply(((CraftWorld) world).getHandle(), chunkX, chunkZ, (ProtoChunk) prepared,
-                (pos, nbt) -> loadTileEntity(world, pos.getX(), pos.getY(), pos.getZ(), nbt));
+                (pos, nbt) -> loadTileEntity(world, pos.getX(), pos.getY(), pos.getZ(), nbt), regenerateEntities);
     }
 }

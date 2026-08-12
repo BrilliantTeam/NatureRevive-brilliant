@@ -6,6 +6,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.GenerationChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.util.StaticCache2D;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -27,6 +30,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -277,7 +281,7 @@ final class InPlaceRegeneration1_21_9 {
     }
 
     /** Chunk thread. {@code blockEntityLoader} is the handler's own loadTileEntity. */
-    static void apply(ServerLevel level, int chunkX, int chunkZ, ProtoChunk generated, BiConsumer<BlockPos, String> blockEntityLoader) {
+    static void apply(ServerLevel level, int chunkX, int chunkZ, ProtoChunk generated, BiConsumer<BlockPos, String> blockEntityLoader, boolean regenerateEntities) {
         LevelChunk live = level.getChunkIfLoaded(chunkX, chunkZ);
         if (live == null)
             throw new IllegalStateException("Chunk %d,%d unloaded before its regeneration could be applied.".formatted(chunkX, chunkZ));
@@ -314,5 +318,30 @@ final class InPlaceRegeneration1_21_9 {
             CompoundTag nbt = generated.getBlockEntityNbtForSaving(blockEntityPos, level.registryAccess());
             if (nbt != null) blockEntityLoader.accept(blockEntityPos, nbt.toString());
         }
+
+        if (!regenerateEntities) return;
+
+        List<CompoundTag> entities = generated.getEntities();
+        if (entities == null) return;
+        for (CompoundTag entityNbt : entities) {
+            Entity entity = EntityType.loadEntityRecursive(entityNbt, level, EntitySpawnReason.LOAD, loaded -> loaded);
+            if (entity != null) {
+                if (isElytraItemFrame(entity)) continue;
+                removeUnmovedGeneratedEntities(level, entity);
+                level.tryAddFreshEntityWithPassengers(entity);
+            }
+        }
+    }
+
+    private static void removeUnmovedGeneratedEntities(ServerLevel level, Entity generated) {
+        level.getEntities((Entity) null, generated.getBoundingBox().inflate(0.001D), entity ->
+                        entity.getType() == generated.getType()
+                                && entity.position().distanceToSqr(generated.position()) < 0.000001D)
+                .forEach(entity -> entity.getBukkitEntity().remove());
+    }
+
+    private static boolean isElytraItemFrame(Entity entity) {
+        return entity.getBukkitEntity() instanceof org.bukkit.entity.ItemFrame itemFrame
+                && itemFrame.getItem().getType() == org.bukkit.Material.ELYTRA;
     }
 }
