@@ -269,8 +269,6 @@ public class ReadonlyConfig {
                 "某區塊發生變更而重置其重生時間時，一併重置周圍 n 格區塊的時間。",
                 "When a chunk is changed and its expiration is refreshed, also refresh the chunks within n chunks of it.");
 
-        // ---- performance：批次大小與執行頻率，一般情況不需調整 ----
-
         changed |= def(c, "performance.regenerate-n-chunks-per-time", 1,
                 "每次處理重生佇列時最多重生幾個區塊。",
                 "How many chunk(s) to regenerate per queue process period.");
