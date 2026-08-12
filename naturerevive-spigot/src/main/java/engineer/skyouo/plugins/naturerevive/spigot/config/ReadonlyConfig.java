@@ -716,9 +716,7 @@ public class ReadonlyConfig {
             case 19:
                 configuration.set("inplace-regenerate-entities", true);
                 configuration.set("inplace-clear-chunk-persistent-data", true);
-            case 20:
-                configuration.set("inplace-clear-entities-before-regeneration", true);
-            case 21:
+                configuration.set("inplace-clear-entities-before-regeneration", false);
                 configuration.set("inplace-clear-nearby-entities-before-regeneration", false);
                 configuration.set("inplace-clear-nearby-dropped-items-before-regeneration", false);
                 configuration.setComment("inplace-regenerate-entities", convertListStringToString(Arrays.asList(
@@ -767,7 +765,7 @@ public class ReadonlyConfig {
         enableOreObfuscation = configuration.getBoolean("enable-ore-obfuscation", false); // ore-obfuscation.enable
         inPlaceRegenerateEntities = configuration.getBoolean("inplace-regenerate-entities", true);
         inPlaceClearChunkPersistentData = configuration.getBoolean("inplace-clear-chunk-persistent-data", true);
-        inPlaceClearEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-entities-before-regeneration", true);
+        inPlaceClearEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-entities-before-regeneration", false);
         inPlaceClearNearbyEntitiesBeforeRegeneration = configuration.getBoolean("inplace-clear-nearby-entities-before-regeneration", false);
         inPlaceClearNearbyDroppedItemsBeforeRegeneration = configuration.getBoolean("inplace-clear-nearby-dropped-items-before-regeneration", false);
 
