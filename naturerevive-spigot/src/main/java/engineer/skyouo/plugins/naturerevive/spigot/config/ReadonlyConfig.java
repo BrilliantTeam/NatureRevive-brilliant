@@ -309,8 +309,6 @@ public class ReadonlyConfig {
                 "每次可以執行多少個 SQL 指令。",
                 "How many queries to execute per execution period.");
 
-        // ---- 世界與生態域名單 ----
-
         changed |= def(c, "world-list.blacklist", Arrays.asList("世界 1", "World 2"),
                 "此列表內的世界不會被重生。",
                 "Worlds in this list are skipped by the regeneration system.");
