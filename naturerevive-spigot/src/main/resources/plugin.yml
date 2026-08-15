@@ -4,7 +4,7 @@ main: engineer.skyouo.plugins.naturerevive.spigot.NatureRevivePlugin
 api-version: 1.17
 folia-supported: true
 authors: [NCT_skyouo, twseer67875, the_chosen_cat, Brilliant Server.]
-softdepend: [FastAsyncWorldEdit, Residence, CoreProtect, GriefPrevention, GriefDefender, CCP]
+softdepend: [FastAsyncWorldEdit, Residence, CoreProtect, GriefPrevention, GriefDefender, CCP, Towny, WorldGuard]
 website: https://www.brilliantw.net/%E9%96%8B%E6%BA%90%E8%BB%9F%E9%AB%94/
 libraries: [org.xerial:sqlite-jdbc:3.39.3.0, mysql:mysql-connector-java:8.0.30, com.zaxxer:HikariCP:5.0.1]
 commands:

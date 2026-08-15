@@ -22,7 +22,7 @@ public class ReadonlyConfig {
 
     private YamlFile configuration;
 
-    public static final int CONFIG_VERSION = 20;
+    public static final int CONFIG_VERSION = 21;
 
     public boolean debug;
 
@@ -31,6 +31,10 @@ public class ReadonlyConfig {
     public boolean griefPreventionStrictCheck;
 
     public boolean griefDefenderStrictCheck;
+
+    public boolean townyStrictCheck;
+
+    public boolean worldGuardStrictCheck;
 
     public boolean saferOreObfuscation;
 
@@ -338,6 +342,14 @@ public class ReadonlyConfig {
                 "Regenerate chunks containing GriefDefender claims, but keep the blocks inside the claims.",
                 "Demo: https://www.youtube.com/watch?v=euKrueUrD_4&list=PLiqb-2W5wSDFvBwnNJCtt_O-kIem40iDG&index=9");
 
+        changed |= def(c, "lands.towny-strict", false,
+                "重生含有 Towny 地皮的區塊，但保留地皮範圍內的方塊。",
+                "Regenerate chunks containing Towny town blocks, but keep the blocks inside the town blocks.");
+
+        changed |= def(c, "lands.worldguard-strict", false,
+                "重生含有 WorldGuard 領地的區塊，但保留領地範圍內的方塊。",
+                "Regenerate chunks containing WorldGuard regions, but keep the blocks inside the regions.");
+
         changed |= def(c, "ore-obfuscation.enable", false,
                 "開啟礦物混淆，重生後會調換礦物位置，避免玩家記下座標後重複挖同一批礦。",
                 "Shuffle ore positions after a chunk is regenerated, so players cannot farm ores by",
@@ -503,6 +515,8 @@ public class ReadonlyConfig {
         residenceStrictCheck = configuration.getBoolean("lands.residence-strict", false);
         griefPreventionStrictCheck = configuration.getBoolean("lands.griefprevention-strict", false);
         griefDefenderStrictCheck = configuration.getBoolean("lands.griefdefender-strict", false);
+        townyStrictCheck = configuration.getBoolean("lands.towny-strict", false);
+        worldGuardStrictCheck = configuration.getBoolean("lands.worldguard-strict", false);
 
         enableOreObfuscation = configuration.getBoolean("ore-obfuscation.enable", false);
         saferOreObfuscation = configuration.getBoolean("ore-obfuscation.safer", true);

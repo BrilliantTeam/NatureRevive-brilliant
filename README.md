@@ -13,7 +13,7 @@
 
 ## 🔴 Dependencies
 
-**CoreProtect (Optional), Residence (Optional), GriefPrevention (Optional), FastAsyncWorldEdit (Optional, Required for 1.21+)**
+**CoreProtect (Optional), Residence (Optional), GriefPrevention (Optional), GriefDefender (Optional), Towny (Optional), WorldGuard (Optional), FastAsyncWorldEdit (Optional, Required for 1.21+)**
 
 ## 🖌 Commands
 

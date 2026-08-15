@@ -10,6 +10,8 @@ import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ChunkClaimIn
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefDefenderIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.GriefPreventionIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.land.ResidenceIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.integration.land.TownyIntegration;
+import engineer.skyouo.plugins.naturerevive.spigot.integration.land.WorldGuardIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.integration.logging.CoreProtectIntegration;
 import engineer.skyouo.plugins.naturerevive.spigot.lang.Lang;
 import net.kyori.adventure.text.format.TextColor;
@@ -30,6 +32,8 @@ public class IntegrationManager implements IIntegrationManager {
         builtinDependencies.add(new GriefDefenderIntegration());
         builtinDependencies.add(new GriefPreventionIntegration());
         builtinDependencies.add(new ChunkClaimIntegration());
+        builtinDependencies.add(new TownyIntegration());
+        builtinDependencies.add(new WorldGuardIntegration());
         builtinDependencies.add(new DefaultEngineIntegration());
         builtinDependencies.add(new FAWEIntegration());
         builtinDependencies.add(new InPlaceEngineIntegration());

@@ -21,6 +21,8 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/central")
     maven("https://maven.playpro.com")
     //maven("https://repo.glaremasters.me/repository/bloodshot")
+    maven("https://repo.glaremasters.me/repository/towny/")
+    maven("https://maven.enginehub.org/repo/")
     maven("https://jitpack.io")
     mavenCentral()
 }
@@ -39,6 +41,8 @@ dependencies {
     compileOnly(files("libs/GriefDefenderAPI-2.1.0-SNAPSHOT.jar")) //compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
     compileOnly(files("libs/Residence5.1.5.0.jar"))
     compileOnly(files("libs/ChunkClaimPlugin-0.7.0.jar"))
+    compileOnly("com.palmergames.bukkit.towny:towny:0.103.2.0") { isTransitive = false }
+    compileOnly("com.sk89q.worldguard:worldguard-core:7.0.13") { isTransitive = false }
 
     implementation(project(":naturerevive-common"))
 
