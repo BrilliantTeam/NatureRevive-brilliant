@@ -31,6 +31,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -307,6 +308,11 @@ final class InPlaceRegeneration26_2 {
                 }
             }
         }
+
+        live.fillBiomesFromNoise((quartX, quartY, quartZ, sampler) -> generated.getNoiseBiome(quartX, quartY, quartZ),
+                level.getChunkSource().randomState().sampler());
+        live.markUnsaved();
+        level.getChunkSource().chunkMap.resendBiomesForChunks(List.of(live));
 
         // setBlock only makes bare block entities, so push the generated NBT in for the LootTable tag.
         Set<BlockPos> blockEntities = new HashSet<>(generated.getBlockEntities().keySet());

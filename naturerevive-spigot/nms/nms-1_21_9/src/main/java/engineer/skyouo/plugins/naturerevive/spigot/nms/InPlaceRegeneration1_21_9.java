@@ -308,6 +308,11 @@ final class InPlaceRegeneration1_21_9 {
             }
         }
 
+        live.fillBiomesFromNoise((quartX, quartY, quartZ, sampler) -> generated.getNoiseBiome(quartX, quartY, quartZ),
+                level.getChunkSource().randomState().sampler());
+        live.markUnsaved();
+        level.getChunkSource().chunkMap.resendBiomesForChunks(List.of(live));
+
         // setBlock only makes bare block entities, so push the generated NBT in for the LootTable tag.
         Set<BlockPos> blockEntities = new HashSet<>(generated.getBlockEntities().keySet());
         blockEntities.addAll(generated.getBlockEntityNbts().keySet());

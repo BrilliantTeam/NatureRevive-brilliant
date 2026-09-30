@@ -70,7 +70,7 @@ public class FAWEIntegration implements IEngineIntegration {
                 ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
                     FoliaRegionContext.inject(worldData);
                     try {
-                        FaweImplRegeneration.regenerate(world, chunkX, chunkZ, false, postTask);
+                        FaweImplRegeneration.regenerate(world, chunkX, chunkZ, true, postTask);
                     } catch (Exception e) {
                         e.printStackTrace();
                         ChunkRegeneration.releaseInFlightWithTickets(world, chunkX, chunkZ);
@@ -86,7 +86,7 @@ public class FAWEIntegration implements IEngineIntegration {
 
             ScheduleUtil.GLOBAL.runTaskAsynchronously(plugin, () -> {
                 try {
-                    FaweImplRegeneration.regenerate(world, chunkX, chunkZ, false, postTask);
+                    FaweImplRegeneration.regenerate(world, chunkX, chunkZ, true, postTask);
                 } catch (Exception e) {
                     e.printStackTrace();
                     ChunkRegeneration.releaseInFlightWithTickets(world, chunkX, chunkZ);
