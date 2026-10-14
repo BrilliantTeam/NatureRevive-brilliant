@@ -33,6 +33,10 @@ public class Util {
             return (INMSWrapper) getClassAndInit(nmsWrapperPrefix + "NMSHandler26_2");
         }
 
+        if (versions[0] == 26 && versions[1] == 3) {
+            return (INMSWrapper) getClassAndInit(nmsWrapperPrefix + "NMSHandler26_3");
+        }
+
         switch (versions[1]) {
             case 17:
                 return (INMSWrapper) getClassAndInit(nmsWrapperPrefix + "NMSHandler1_17");
